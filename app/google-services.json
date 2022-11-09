@@ -1,0 +1,106 @@
+{
+  "project_info": {
+    "project_number": "139645795647",
+    "firebase_url": "https://dormapptest-6243f-default-rtdb.firebaseio.com",
+    "project_id": "dormapptest-6243f",
+    "storage_bucket": "dormapptest-6243f.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:139645795647:android:78a7bf162369f0a1c2678a",
+        "android_client_info": {
+          "package_name": "com.firstapplication.dormapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "139645795647-g94ftkkntilo2d67s566d4eu8bve3u77.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBAr0gYn7ubyS5t5vI4a5IN-Vh2Bo71U4w"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "139645795647-g94ftkkntilo2d67s566d4eu8bve3u77.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:139645795647:android:1970b2359d8a8a85c2678a",
+        "android_client_info": {
+          "package_name": "com.firstapplication.realtimedbtest"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "139645795647-g94ftkkntilo2d67s566d4eu8bve3u77.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBAr0gYn7ubyS5t5vI4a5IN-Vh2Bo71U4w"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "139645795647-g94ftkkntilo2d67s566d4eu8bve3u77.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:139645795647:android:7dcc986f9e98c335c2678a",
+        "android_client_info": {
+          "package_name": "com.firstapplication.realtimetest"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "139645795647-f9ip7nb9i5eobksbf6j0l8d36ppikdtg.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.firstapplication.realtimetest",
+            "certificate_hash": "0108fdb054df54b8e08612ff853c4e0311d8e8f3"
+          }
+        },
+        {
+          "client_id": "139645795647-g94ftkkntilo2d67s566d4eu8bve3u77.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBAr0gYn7ubyS5t5vI4a5IN-Vh2Bo71U4w"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "139645795647-g94ftkkntilo2d67s566d4eu8bve3u77.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

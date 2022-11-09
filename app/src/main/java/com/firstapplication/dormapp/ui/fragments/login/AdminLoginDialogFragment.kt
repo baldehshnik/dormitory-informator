@@ -12,7 +12,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
 import com.firstapplication.dormapp.ADMIN_KEY
 import com.firstapplication.dormapp.R
-import com.firstapplication.dormapp.ui.activity.LoginActivity
+import com.firstapplication.dormapp.ui.activity.MainActivity
 
 class AdminLoginDialogFragment : DialogFragment() {
 
@@ -20,9 +20,9 @@ class AdminLoginDialogFragment : DialogFragment() {
 
     private val positiveListener = DialogInterface.OnClickListener { dialogInterface, _ ->
         if (editTextKey.text.toString() == ADMIN_KEY) {
-            val sharedPreferences = requireActivity().getSharedPreferences(LoginActivity.LOGIN_USER_PREF, MODE_PRIVATE)
+            val sharedPreferences = requireActivity().getSharedPreferences(MainActivity.LOGIN_USER_PREF, MODE_PRIVATE)
             sharedPreferences.edit()
-                .putString(LoginActivity.LOGIN_KEY, resources.getString(R.string.admin_key))
+                .putString(MainActivity.LOGIN_KEY, resources.getString(R.string.admin_key))
                 .apply()
 
             Log.i(this.javaClass.simpleName, resources.getString(R.string.user_saved))

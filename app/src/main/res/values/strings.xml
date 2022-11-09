@@ -20,5 +20,8 @@
 
     <string name="key_not_valid">Key is not valid</string>
     <string name="user_saved">User was saved</string>
+    <string name="pass_number">Pass number</string>
+    <string name="room_number">Room number</string>
+    <string name="password">Password</string>
 
 </resources>

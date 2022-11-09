@@ -12,9 +12,6 @@
         android:theme="@style/Theme.DormApp">
         <activity
             android:name=".ui.activity.MainActivity"
-            android:exported="false" />
-        <activity
-            android:name=".ui.activity.LoginActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -23,5 +20,4 @@
             </intent-filter>
         </activity>
     </application>
-
 </manifest>

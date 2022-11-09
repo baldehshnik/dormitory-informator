@@ -4,18 +4,23 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.firstapplication.dormapp.R
 import com.firstapplication.dormapp.databinding.ActivityLoginBinding
+import com.firstapplication.dormapp.di.ActivitySubComponent
+import com.firstapplication.dormapp.extensions.appComponent
 import com.firstapplication.dormapp.ui.fragments.admin.AddWorkFragment
 import com.firstapplication.dormapp.ui.fragments.login.MainLoginFragment
 import com.firstapplication.dormapp.ui.fragments.student.AccountFragment
 
-class LoginActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityLoginBinding
+    var activityComponent: ActivitySubComponent? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        activityComponent = appComponent.activityComponentBuilder().build()
 
         if (savedInstanceState == null) {
             val sharedPreferences = getSharedPreferences(LOGIN_USER_PREF, MODE_PRIVATE)
@@ -25,6 +30,12 @@ class LoginActivity : AppCompatActivity() {
                 openUserFragment(sharedPreferences.getString(LOGIN_KEY, "")!!)
             }
         }
+
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        activityComponent = null
     }
 
     private fun openUserFragment(key: String) = when {
