@@ -20,6 +20,10 @@
 
     <string name="key_not_valid">Key is not valid</string>
     <string name="user_saved">User was saved</string>
+    <string name="verified">verified</string>
+    <string name="not_verified">not verified</string>
+    <string name="date_not_correct">data isn\'t correct</string>
+
     <string name="pass_number">Pass number</string>
     <string name="room_number">Room number</string>
     <string name="password">Password</string>

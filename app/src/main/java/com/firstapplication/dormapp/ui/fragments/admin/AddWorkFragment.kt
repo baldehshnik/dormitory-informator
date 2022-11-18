@@ -21,4 +21,10 @@ class AddWorkFragment : Fragment() {
         return binding.root
     }
 
+    companion object {
+        fun newInstance(): AddWorkFragment {
+            return AddWorkFragment()
+        }
+    }
+
 }

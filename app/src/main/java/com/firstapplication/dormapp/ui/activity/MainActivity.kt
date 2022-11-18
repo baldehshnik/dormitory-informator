@@ -1,6 +1,7 @@
 package com.firstapplication.dormapp.ui.activity
 
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import com.firstapplication.dormapp.R
 import com.firstapplication.dormapp.databinding.ActivityLoginBinding
@@ -46,25 +47,30 @@ class MainActivity : AppCompatActivity() {
                 openAdminFragment()
             }
             else -> {
-                openStudentFragment()
+                try {
+                    openStudentFragment(key.toInt())
+                } catch (e: Exception) {
+                    Log.e(this::class.java.simpleName, e.message ?: "")
+                    openLoginFragment()
+                }
             }
         }
 
     private fun openAdminFragment() {
         supportFragmentManager.beginTransaction()
-            .add(R.id.fragmentLoginContainer, AddWorkFragment())
+            .add(R.id.fragmentContainer, AddWorkFragment.newInstance())
             .commit()
     }
 
-    private fun openStudentFragment() {
+    private fun openStudentFragment(key: Int) {
         supportFragmentManager.beginTransaction()
-            .add(R.id.fragmentLoginContainer, AccountFragment())
+            .add(R.id.fragmentContainer, AccountFragment.newInstance(key = key))
             .commit()
     }
 
     private fun openLoginFragment() {
         supportFragmentManager.beginTransaction()
-            .add(R.id.fragmentLoginContainer, MainLoginFragment())
+            .add(R.id.fragmentContainer, MainLoginFragment.newInstance())
             .commit()
     }
 

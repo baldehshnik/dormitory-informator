@@ -9,10 +9,13 @@ import android.util.Log
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.core.os.bundleOf
 import androidx.fragment.app.DialogFragment
 import com.firstapplication.dormapp.ADMIN_KEY
 import com.firstapplication.dormapp.R
 import com.firstapplication.dormapp.ui.activity.MainActivity
+import com.firstapplication.dormapp.ui.fragments.login.MainLoginFragment.Companion.ADMIN_INIT
+import com.firstapplication.dormapp.ui.fragments.login.MainLoginFragment.Companion.ADMIN_LOGIN_KEY
 
 class AdminLoginDialogFragment : DialogFragment() {
 
@@ -26,9 +29,11 @@ class AdminLoginDialogFragment : DialogFragment() {
                 .apply()
 
             Log.i(this.javaClass.simpleName, resources.getString(R.string.user_saved))
+            parentFragmentManager.setFragmentResult(ADMIN_LOGIN_KEY, bundleOf(ADMIN_INIT to true))
         } else {
             Toast.makeText(requireContext(), resources.getString(R.string.key_not_valid), Toast.LENGTH_SHORT).show()
             Log.i(this.javaClass.simpleName, resources.getString(R.string.key_not_valid))
+            parentFragmentManager.setFragmentResult(ADMIN_LOGIN_KEY, bundleOf(ADMIN_INIT to false))
         }
         dialogInterface.dismiss()
     }
@@ -49,6 +54,10 @@ class AdminLoginDialogFragment : DialogFragment() {
     }
 
     companion object {
-        const val TAG = "ADMIN LOGIN TAG"
+        const val TAG = "ADMIN_LOGIN_TAG"
+
+        fun newInstance(): AdminLoginDialogFragment {
+            return AdminLoginDialogFragment()
+        }
     }
 }

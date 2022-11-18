@@ -1,29 +1,29 @@
 package com.firstapplication.dormapp.ui.viewmodels
 
 import android.app.Application
-import androidx.lifecycle.*
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.viewModelScope
 import com.firstapplication.dormapp.data.interfacies.StudentRepository
 import com.firstapplication.dormapp.data.models.SingleEvent
 import com.firstapplication.dormapp.data.models.StudentModel
 import com.firstapplication.dormapp.data.repositories.StudentRepositoryImpl
 import com.firstapplication.dormapp.di.ActivityScope
+import com.firstapplication.dormapp.ui.models.StudentVerifyModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 @ActivityScope
-class StudentLoginViewModel(
+class StudentViewModel(
     application: Application,
     private val repository: StudentRepository
 ) : AndroidViewModel(application) {
 
-    val verifiedUser: StateFlow<SingleEvent<Int>> get() = (repository as StudentRepositoryImpl).verifiedUser
+    val userDataAccount: StateFlow<SingleEvent<StudentModel>> get() = (repository as StudentRepositoryImpl).userDataAccount
 
-    fun checkUser(passNumber: Int, roomNumber: Int, password: String) {
+    fun getVerifiedUser(studentVerifyModel: StudentVerifyModel) {
         viewModelScope.launch(Dispatchers.IO) {
-            repository.checkStudentInDatabase(StudentModel(
-                passNumber = passNumber, roomNumber = roomNumber, password = password
-            ))
+            repository.getVerifiedUser(studentModel = studentVerifyModel.migrateToStudentModel())
         }
     }
 
