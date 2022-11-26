@@ -1,5 +1,9 @@
 <resources>
+
+    // Application parameters
     <string name="app_name">DormApp</string>
+
+
     <string name="hello_blank_fragment">Hello blank fragment</string>
 
     <string name="first_info_text">Some first info text</string>
@@ -18,14 +22,26 @@
     <string name="cancel">Cancel</string>
 
 
+    <string name="database_error">Database error</string>
+    <string name="connection_failed">Connection failed</string>
+    <string name="user_not_found">User not found</string>
     <string name="key_not_valid">Key is not valid</string>
     <string name="user_saved">User was saved</string>
     <string name="verified">verified</string>
     <string name="not_verified">not verified</string>
+    <string name="not_encrypted">not encrypted</string>
     <string name="date_not_correct">data isn\'t correct</string>
+
 
     <string name="pass_number">Pass number</string>
     <string name="room_number">Room number</string>
     <string name="password">Password</string>
+
+    // Student menu
+    <string name="account">Account</string>
+    <string name="news">News</string>
+
+    // Content description
+    <string name="student_image">student image</string>
 
 </resources>

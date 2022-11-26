@@ -1,8 +1,8 @@
 package com.firstapplication.dormapp.data.interfacies
 
-import com.firstapplication.dormapp.data.models.StudentModel
+import com.firstapplication.dormapp.data.models.StudentVerifyEntity
 
 interface StudentRepository {
-    fun checkStudentInDatabase(studentModel: StudentModel)
-    fun getVerifiedUser(studentModel: StudentModel)
+    fun checkStudentInDatabase(studentVerifyEntity: StudentVerifyEntity)
+    fun getVerifiedUser(studentVerifyEntity: StudentVerifyEntity)
 }

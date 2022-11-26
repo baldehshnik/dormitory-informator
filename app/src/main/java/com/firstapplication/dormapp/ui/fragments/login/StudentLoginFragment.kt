@@ -5,10 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.core.os.bundleOf
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.setFragmentResult
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.firstapplication.dormapp.DormApp
@@ -16,6 +13,7 @@ import com.firstapplication.dormapp.Encryptor
 import com.firstapplication.dormapp.R
 import com.firstapplication.dormapp.databinding.FragmentStudentLoginBinding
 import com.firstapplication.dormapp.ui.activity.MainActivity
+import com.firstapplication.dormapp.ui.fragments.BasicFragment
 import com.firstapplication.dormapp.ui.fragments.login.MainLoginFragment.Companion.STUDENT_INIT
 import com.firstapplication.dormapp.ui.fragments.login.MainLoginFragment.Companion.STUDENT_LOGIN_KEY
 import com.firstapplication.dormapp.ui.viewmodels.StudentLoginViewModel
@@ -24,7 +22,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
-class StudentLoginFragment : Fragment() {
+class StudentLoginFragment : BasicFragment() {
 
     private lateinit var binding: FragmentStudentLoginBinding
 
@@ -35,17 +33,12 @@ class StudentLoginFragment : Fragment() {
         viewModelFactory.create(activity?.application as DormApp)
     }
 
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        (activity as MainActivity).activityComponent.also { it?.inject(this) }
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-
         binding = FragmentStudentLoginBinding.inflate(inflater, container, false)
+        (activity as MainActivity).activityComponent.also { it?.inject(this) }
 
         with(binding) {
             btnConfirm.setOnClickListener {
@@ -89,7 +82,7 @@ class StudentLoginFragment : Fragment() {
                 sharedPreferences.edit()
                     .putString(MainActivity.LOGIN_KEY, passStr)
                     .putInt(ROOM_KEY, roomStr.toInt())
-                    .putString(PASSWORD_KEY, Encryptor().toEncrypt(password) ?: "not encrypted")
+                    .putString(PASSWORD_KEY, Encryptor().toEncrypt(password) ?: getStringFromRes(R.string.not_encrypted))
                     .apply()
 
                 parentFragmentManager.setFragmentResult(STUDENT_LOGIN_KEY, bundleOf(
@@ -98,14 +91,10 @@ class StudentLoginFragment : Fragment() {
                 parentFragmentManager.popBackStack()
             }
             -1 -> {
-                Toast.makeText(
-                    requireContext(),
-                    resources.getString(R.string.not_verified),
-                    Toast.LENGTH_SHORT
-                ).show()
+                toast(getStringFromRes(R.string.not_verified))
             }
             else -> {
-                Toast.makeText(requireContext(), "database error", Toast.LENGTH_SHORT).show()
+                toast(getStringFromRes(R.string.database_error))
             }
         }
 
@@ -121,7 +110,7 @@ class StudentLoginFragment : Fragment() {
             viewModel.checkUser(passNumber, roomNumber, Encryptor().toEncrypt(password) ?: "")
             binding.progressBar.visibility = View.VISIBLE
         } catch (e: Exception) {
-            Toast.makeText(requireContext(), resources.getString(R.string.date_not_correct), Toast.LENGTH_SHORT).show()
+            toast(getStringFromRes(R.string.date_not_correct))
         }
     }
 
@@ -134,5 +123,4 @@ class StudentLoginFragment : Fragment() {
             return StudentLoginFragment()
         }
     }
-
 }

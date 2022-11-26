@@ -1,6 +1,6 @@
 package com.firstapplication.dormapp.ui.models
 
-import com.firstapplication.dormapp.data.models.StudentModel
+import com.firstapplication.dormapp.data.models.StudentVerifyEntity
 
 data class StudentVerifyModel(
     val passNumber: Int,
@@ -8,8 +8,8 @@ data class StudentVerifyModel(
     val password: String
 ) {
 
-    fun migrateToStudentModel(): StudentModel {
-        return StudentModel(passNumber, roomNumber, password)
+    fun migrateToStudentModel(): StudentVerifyEntity {
+        return StudentVerifyEntity(passNumber, roomNumber, password)
     }
 
 }

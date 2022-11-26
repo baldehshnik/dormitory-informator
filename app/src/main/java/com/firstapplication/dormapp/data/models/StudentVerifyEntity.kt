@@ -5,7 +5,7 @@ import com.firstapplication.dormapp.ui.models.StudentVerifyModel
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-data class StudentModel(
+data class StudentVerifyEntity(
     val passNumber: Int = -1,
     val roomNumber: Int = -1,
     val password: String = ""

@@ -51,7 +51,6 @@ class MainLoginFragment : Fragment(R.layout.fragment_main_login) {
             .add(R.id.fragmentContainer, AccountFragment.newInstance(userKey))
             .remove(this@MainLoginFragment)
             .commit()
-
     }
 
     private fun openAdminLoginFragment() {

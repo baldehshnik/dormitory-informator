@@ -6,8 +6,9 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.firstapplication.dormapp.databinding.FragmentNewsListBinding
+import com.firstapplication.dormapp.ui.fragments.BasicFragment
 
-class NewsListFragment : Fragment() {
+class NewsListFragment : BasicFragment() {
 
     private lateinit var binding: FragmentNewsListBinding
 
@@ -20,6 +21,13 @@ class NewsListFragment : Fragment() {
 
 
         return binding.root
+    }
+
+    companion object {
+        @JvmStatic
+        fun newInstance(): NewsListFragment {
+            return NewsListFragment()
+        }
     }
 
 }
