@@ -41,7 +41,8 @@ ext {
     viewModelVersion = "2.5.1"
     coroutinesVersion = "1.6.4"
     navigationVersion = "2.5.3"
-    daggerVersion = "2.43.2"
+    daggerVersion = "2.44.2"
+    roomVersion = "2.4.3"
 }
 
 dependencies {
@@ -73,4 +74,9 @@ dependencies {
 
     // Firebase
     implementation 'com.google.firebase:firebase-database-ktx:20.1.0'
+
+    // Room
+    implementation  "androidx.room:room-ktx:$roomVersion"
+    implementation "androidx.room:room-runtime:$roomVersion"
+    kapt("androidx.room:room-compiler:$roomVersion")
 }

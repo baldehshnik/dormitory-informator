@@ -13,6 +13,7 @@ class DormApp : Application() {
     override fun onCreate() {
         super.onCreate()
         appComponent = DaggerAppComponent.builder()
+            .context(applicationContext)
             .build()
     }
 }

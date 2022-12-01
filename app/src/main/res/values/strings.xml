@@ -43,5 +43,6 @@
 
     // Content description
     <string name="student_image">student image</string>
+    <string name="news_icon_image">news icon image</string>
 
 </resources>

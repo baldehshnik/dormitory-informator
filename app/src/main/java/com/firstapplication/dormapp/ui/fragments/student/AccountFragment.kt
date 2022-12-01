@@ -7,20 +7,24 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.widget.Toolbar
 import androidx.core.os.bundleOf
+import androidx.core.view.children
+import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.firstapplication.dormapp.DormApp
 import com.firstapplication.dormapp.R
 import com.firstapplication.dormapp.databinding.FragmentAccountBinding
 import com.firstapplication.dormapp.ui.activity.MainActivity
+import com.firstapplication.dormapp.ui.adapters.NewsAdapter
 import com.firstapplication.dormapp.ui.fragments.BasicFragment
 import com.firstapplication.dormapp.ui.fragments.login.MainLoginFragment
 import com.firstapplication.dormapp.ui.fragments.login.StudentLoginFragment.Companion.PASSWORD_KEY
 import com.firstapplication.dormapp.ui.fragments.login.StudentLoginFragment.Companion.ROOM_KEY
 import com.firstapplication.dormapp.ui.models.StudentModel
 import com.firstapplication.dormapp.ui.models.StudentVerifyModel
-import com.firstapplication.dormapp.ui.viewmodels.StudentViewModel
+import com.firstapplication.dormapp.ui.viewmodels.AccountViewModel
 import com.firstapplication.dormapp.ui.viewmodels.factories.StudentViewModelFactory
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import javax.inject.Inject
@@ -33,7 +37,7 @@ class AccountFragment : BasicFragment() {
     @Inject
     lateinit var viewModelFactory: StudentViewModelFactory.Factory
 
-    private val viewModel: StudentViewModel by viewModels {
+    private val viewModel: AccountViewModel by viewModels {
         viewModelFactory.create(activity?.application as DormApp)
     }
 
@@ -47,6 +51,11 @@ class AccountFragment : BasicFragment() {
         binding = FragmentAccountBinding.inflate(inflater, container, false)
         (activity as MainActivity).activityComponent.also { it?.inject(this) }
 
+        requireActivity().findViewById<Toolbar>(R.id.toolbar).isVisible = false
+
+        binding.root.children.forEach { it.isVisible = false }
+        binding.progressBar.isVisible = true
+
         if (savedInstanceState == null) {
             initUser(arguments?.getInt(USER_KEY, -1) ?: -1)
         } else {
@@ -55,10 +64,20 @@ class AccountFragment : BasicFragment() {
             else initUI(studentInfo!!)
         }
 
-        requireActivity().findViewById<BottomNavigationView>(R.id.studentBottomView)?.visibility = View.VISIBLE
+        requireActivity().findViewById<BottomNavigationView>(R.id.studentBottomView)?.visibility =
+            View.VISIBLE
 
         lifecycleScope.launchWhenCreated {
             dbResponse()
+        }
+
+        val adapter = NewsAdapter()
+        binding.rwSavedNews.adapter = adapter
+
+        viewModel.savedNews.observe(viewLifecycleOwner) { newsModels ->
+            adapter.submitList(newsModels)
+            binding.rwSavedNews.isVisible = true
+            binding.progressBarNews.isVisible = false
         }
 
         binding.root.layoutTransition.enableTransitionType(LayoutTransition.CHANGING)
@@ -86,6 +105,7 @@ class AccountFragment : BasicFragment() {
                 else -> {
                     studentInfo = value
                     toast(getStringFromRes(R.string.verified))
+                    viewModel.addSavedNewsListener()
                     initUI(value)
                 }
             }
@@ -94,8 +114,10 @@ class AccountFragment : BasicFragment() {
 
     @SuppressLint("SetTextI18n")
     private fun initUI(model: StudentModel) {
-        binding.progressBar.visibility = View.GONE
-        binding.viewLayout.visibility = View.VISIBLE
+        binding.root.children.forEach { it.isVisible = true }
+        binding.progressBar.isVisible = false
+        binding.rwSavedNews.isVisible = false
+        requireActivity().findViewById<Toolbar>(R.id.toolbar).isVisible = true
 
         binding.twPassNumber.text = model.passNumber.toString()
         binding.twRoomNumber.text = model.roomNumber.toString()
@@ -107,7 +129,10 @@ class AccountFragment : BasicFragment() {
     }
 
     private fun setLoginFragment() {
-        val sharedPreferences = requireActivity().getSharedPreferences(MainActivity.LOGIN_USER_PREF, Context.MODE_PRIVATE)
+        val sharedPreferences = requireActivity().getSharedPreferences(
+            MainActivity.LOGIN_USER_PREF,
+            Context.MODE_PRIVATE
+        )
         sharedPreferences.edit()
             .clear()
             .apply()
@@ -121,7 +146,10 @@ class AccountFragment : BasicFragment() {
     private fun initUser(key: Int) {
         if (key == -1) setLoginFragment()
 
-        val sharedPreferences = requireActivity().getSharedPreferences(MainActivity.LOGIN_USER_PREF, Context.MODE_PRIVATE)
+        val sharedPreferences = requireActivity().getSharedPreferences(
+            MainActivity.LOGIN_USER_PREF,
+            Context.MODE_PRIVATE
+        )
         val room = sharedPreferences.getInt(ROOM_KEY, -1)
         val password = sharedPreferences.getString(PASSWORD_KEY, "")!!
 

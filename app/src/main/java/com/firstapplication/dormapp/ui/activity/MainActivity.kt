@@ -50,6 +50,7 @@ class MainActivity : AppCompatActivity() {
             binding.studentBottomView.selectedItemId = R.id.itemNewsList
         } else if (supportFragmentManager.findFragmentByTag(ACCOUNT_FRAGMENT_TAG)?.isVisible == true) {
             binding.studentBottomView.selectedItemId = R.id.itemAccount
+            supportFragmentManager.popBackStack()
         }
     }
 

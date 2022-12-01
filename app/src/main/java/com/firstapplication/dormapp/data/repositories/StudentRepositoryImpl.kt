@@ -1,23 +1,24 @@
 package com.firstapplication.dormapp.data.repositories
 
 import android.util.Log
+import com.firstapplication.dormapp.data.interfacies.SavedNewsDao
 import com.firstapplication.dormapp.data.interfacies.StudentRepository
-import com.firstapplication.dormapp.data.models.SingleEvent
-import com.firstapplication.dormapp.data.models.StudentEntity
-import com.firstapplication.dormapp.data.models.StudentVerifyEntity
-import com.firstapplication.dormapp.ui.models.StudentModel
+import com.firstapplication.dormapp.data.models.*
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
-import com.google.firebase.database.ktx.database
-import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import javax.inject.Inject
+import javax.inject.Singleton
 
-
-class StudentRepositoryImpl @Inject constructor() : StudentRepository {
+@Singleton
+class StudentRepositoryImpl @Inject constructor(
+    private val database: FirebaseDatabase,
+    private val newsDao: SavedNewsDao
+) : StudentRepository {
 
     private val _verifiedUser = MutableStateFlow(SingleEvent(value = 0))
     val verifiedUser: StateFlow<SingleEvent<Int>> get() = _verifiedUser.asStateFlow()
@@ -25,16 +26,21 @@ class StudentRepositoryImpl @Inject constructor() : StudentRepository {
     private val _userDataAccount = MutableStateFlow(SingleEvent(StudentEntity()))
     val userDataAccount: StateFlow<SingleEvent<StudentEntity>> get() = _userDataAccount.asStateFlow()
 
+    private val _newsData = MutableStateFlow(listOf(NewsEntity()))
+    val newsData: StateFlow<List<NewsEntity>> get() = _newsData.asStateFlow()
+
     override fun checkStudentInDatabase(studentVerifyEntity: StudentVerifyEntity) {
-        val rootReference = Firebase.database.reference
-        val userReference = rootReference.child(PACKAGE_USERS).child(studentVerifyEntity.passNumber.toString())
+        val rootReference = database.reference
+        val userReference =
+            rootReference.child(PACKAGE_USERS).child(studentVerifyEntity.passNumber.toString())
 
         userReference.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 if (dataSnapshot.exists()) {
                     val passNumber = dataSnapshot.child(PASS_KEY).getValue(Int::class.java) ?: 0
                     val roomNumber = dataSnapshot.child(ROOM_KEY).getValue(Int::class.java) ?: 0
-                    val password = dataSnapshot.child(PASSWORD_KEY).getValue(String::class.java) ?: ""
+                    val password =
+                        dataSnapshot.child(PASSWORD_KEY).getValue(String::class.java) ?: ""
 
                     val user = StudentVerifyEntity(passNumber, roomNumber, password)
                     if (user != studentVerifyEntity) _verifiedUser.value = SingleEvent(value = -1)
@@ -52,28 +58,30 @@ class StudentRepositoryImpl @Inject constructor() : StudentRepository {
     }
 
     override fun getVerifiedUser(studentVerifyEntity: StudentVerifyEntity) {
-        val rootReference = Firebase.database.reference
-        val userReference = rootReference.child(PACKAGE_USERS).child(studentVerifyEntity.passNumber.toString())
+        val rootReference = database.reference
+        val userReference =
+            rootReference.child(PACKAGE_USERS).child(studentVerifyEntity.passNumber.toString())
 
-        userReference.addListenerForSingleValueEvent(object : ValueEventListener{
+        userReference.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 if (dataSnapshot.exists()) {
                     val passNumber = dataSnapshot.child(PASS_KEY).getValue(Int::class.java) ?: 0
                     val roomNumber = dataSnapshot.child(ROOM_KEY).getValue(Int::class.java) ?: 0
-                    val password = dataSnapshot.child(PASSWORD_KEY).getValue(String::class.java) ?: ""
+                    val password =
+                        dataSnapshot.child(PASSWORD_KEY).getValue(String::class.java) ?: ""
 
                     val user = StudentVerifyEntity(passNumber, roomNumber, password)
                     if (user != studentVerifyEntity) {
                         _userDataAccount.value = SingleEvent(StudentEntity(passNumber = 0))
-                    }
-                    else {
+                    } else {
                         val studentEntity = StudentEntity(
                             passNumber = user.passNumber,
                             roomNumber = user.roomNumber,
                             password = password
                         )
 
-                        val fullName = dataSnapshot.child(FULL_NAME_KEY).getValue(String::class.java)
+                        val fullName =
+                            dataSnapshot.child(FULL_NAME_KEY).getValue(String::class.java)
                         val hours = dataSnapshot.child(HOURS_KEY).getValue(Double::class.java)
 
                         if (fullName != null) studentEntity.fullName = fullName
@@ -94,8 +102,33 @@ class StudentRepositoryImpl @Inject constructor() : StudentRepository {
         })
     }
 
+    override fun getNews() {
+        val rootReference = database.reference
+        val newsReference = rootReference.child(PACKAGE_NEWS)
+
+        newsReference.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(allSnapshots: DataSnapshot) {
+                val newsList = mutableListOf<NewsEntity>()
+                for (snapshot in allSnapshots.children) {
+                    val entity = snapshot.getValue(NewsEntity::class.java)
+                    if (entity != null) newsList.add(entity)
+                }
+                _newsData.value = newsList
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Log.e(StudentRepositoryImpl::class.java.simpleName, error.message)
+            }
+        })
+    }
+
+    override suspend fun readSavedNewsFromLocalDB(): List<SavedNewsEntity> {
+        return newsDao.readAllSavedNews()
+    }
+
     companion object {
         private const val PACKAGE_USERS = "students"
+        private const val PACKAGE_NEWS = "news"
 
         private const val PASS_KEY = "passNumber"
         private const val ROOM_KEY = "roomNumber"
