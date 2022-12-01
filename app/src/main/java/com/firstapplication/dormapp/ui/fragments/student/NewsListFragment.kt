@@ -15,6 +15,7 @@ import com.firstapplication.dormapp.ui.adapters.NewsAdapter
 import com.firstapplication.dormapp.ui.fragments.BasicFragment
 import com.firstapplication.dormapp.ui.viewmodels.NewsListViewModel
 import com.firstapplication.dormapp.ui.viewmodels.factories.StudentViewModelFactory
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import javax.inject.Inject
 
 class NewsListFragment : BasicFragment() {
@@ -40,6 +41,7 @@ class NewsListFragment : BasicFragment() {
         viewModel.readNewsFromDB()
 
         requireActivity().findViewById<Toolbar>(R.id.toolbar).isVisible = false
+        requireActivity().findViewById<BottomNavigationView>(R.id.studentBottomView).isVisible = true
 
         /////
 //        Firebase.database.reference.child("news").child("fhjdlkfanf")

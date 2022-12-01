@@ -104,7 +104,6 @@ class AccountFragment : BasicFragment() {
                 }
                 else -> {
                     studentInfo = value
-                    toast(getStringFromRes(R.string.verified))
                     viewModel.addSavedNewsListener()
                     initUI(value)
                 }
