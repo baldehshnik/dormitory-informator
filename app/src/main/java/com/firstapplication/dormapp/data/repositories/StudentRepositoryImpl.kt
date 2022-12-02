@@ -4,6 +4,7 @@ import android.util.Log
 import com.firstapplication.dormapp.data.interfacies.SavedNewsDao
 import com.firstapplication.dormapp.data.interfacies.StudentRepository
 import com.firstapplication.dormapp.data.models.*
+import com.firstapplication.dormapp.data.remote.*
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
@@ -124,16 +125,5 @@ class StudentRepositoryImpl @Inject constructor(
 
     override suspend fun readSavedNewsFromLocalDB(): List<SavedNewsEntity> {
         return newsDao.readAllSavedNews()
-    }
-
-    companion object {
-        private const val PACKAGE_USERS = "students"
-        private const val PACKAGE_NEWS = "news"
-
-        private const val PASS_KEY = "passNumber"
-        private const val ROOM_KEY = "roomNumber"
-        private const val PASSWORD_KEY = "password"
-        private const val FULL_NAME_KEY = "fullName"
-        private const val HOURS_KEY = "hours"
     }
 }

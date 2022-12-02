@@ -41,8 +41,12 @@
     <string name="account">Account</string>
     <string name="news">News</string>
 
+    // Admin menu
+    <string name="add">Add</string>
+
     // Content description
     <string name="student_image">student image</string>
     <string name="news_icon_image">news icon image</string>
+    <string name="image_button_edit">image button edit</string>
 
 </resources>

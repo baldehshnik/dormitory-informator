@@ -7,7 +7,9 @@
         <entry key="..\:/Android Projects/app/src/main/res/layout/fragment_main_login.xml" value="0.25416666666666665" />
         <entry key="..\:/Android Projects/app/src/main/res/layout/fragment_student_login.xml" value="0.25416666666666665" />
         <entry key="..\:/DormApp/app/src/main/res/drawable/ic_baseline_account.xml" value="0.2703125" />
+        <entry key="..\:/DormApp/app/src/main/res/drawable/ic_baseline_add.xml" value="0.2703125" />
         <entry key="..\:/DormApp/app/src/main/res/drawable/ic_baseline_card.xml" value="0.2703125" />
+        <entry key="..\:/DormApp/app/src/main/res/drawable/ic_baseline_edit.xml" value="0.2703125" />
         <entry key="..\:/DormApp/app/src/main/res/drawable/ic_baseline_home.xml" value="0.2703125" />
         <entry key="..\:/DormApp/app/src/main/res/drawable/ic_baseline_room.xml" value="0.2703125" />
         <entry key="..\:/DormApp/app/src/main/res/drawable/ic_key.xml" value="0.2703125" />
@@ -18,9 +20,12 @@
         <entry key="..\:/DormApp/app/src/main/res/layout/fragment_admin_login.xml" value="0.25416666666666665" />
         <entry key="..\:/DormApp/app/src/main/res/layout/fragment_main_login.xml" value="0.25416666666666665" />
         <entry key="..\:/DormApp/app/src/main/res/layout/fragment_news_list.xml" value="0.25416666666666665" />
+        <entry key="..\:/DormApp/app/src/main/res/layout/fragment_news_list_admin.xml" value="0.25416666666666665" />
         <entry key="..\:/DormApp/app/src/main/res/layout/fragment_student_login.xml" value="0.25416666666666665" />
         <entry key="..\:/DormApp/app/src/main/res/layout/fragment_work_list.xml" value="0.25416666666666665" />
+        <entry key="..\:/DormApp/app/src/main/res/layout/news_admin_item.xml" value="0.25416666666666665" />
         <entry key="..\:/DormApp/app/src/main/res/layout/news_item.xml" value="0.25416666666666665" />
+        <entry key="..\:/DormApp/app/src/main/res/menu/admin_nav_menu.xml" value="0.25416666666666665" />
         <entry key="..\:/DormApp/app/src/main/res/menu/student_nav_menu.xml" value="0.25416666666666665" />
       </map>
     </option>

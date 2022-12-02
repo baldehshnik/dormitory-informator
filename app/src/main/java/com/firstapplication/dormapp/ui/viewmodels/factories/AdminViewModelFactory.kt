@@ -7,6 +7,7 @@ import com.firstapplication.dormapp.data.interfacies.AdminRepository
 import com.firstapplication.dormapp.di.ActivityScope
 import com.firstapplication.dormapp.ui.fragments.login.StudentLoginFragment
 import com.firstapplication.dormapp.ui.viewmodels.AdminViewModel
+import com.firstapplication.dormapp.ui.viewmodels.NewsListAdminViewModel
 import com.firstapplication.dormapp.ui.viewmodels.StudentLoginViewModel
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
@@ -25,9 +26,11 @@ class AdminViewModelFactory @AssistedInject constructor(
     }
 
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(AdminViewModel::class.java))
-            return createAdminViewModelAsT()
-        throw IllegalArgumentException("Unknown view model class")
+        return when {
+            modelClass.isAssignableFrom(AdminViewModel::class.java) -> createAdminViewModelAsT()
+            modelClass.isAssignableFrom(NewsListAdminViewModel::class.java) -> createNewsListAdminViewModelAsT()
+            else -> throw IllegalArgumentException("Unknown view model class")
+        }
     }
 
     @Suppress("UNCHECKED_CAST")
@@ -35,4 +38,8 @@ class AdminViewModelFactory @AssistedInject constructor(
         return AdminViewModel(application, adminRepository) as T
     }
 
+    @Suppress("UNCHECKED_CAST")
+    fun <T: ViewModel> createNewsListAdminViewModelAsT(): T {
+        return NewsListAdminViewModel(application, adminRepository) as T
+    }
 }
