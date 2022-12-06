@@ -23,6 +23,9 @@
 
 
     <string name="database_error">Database error</string>
+    <string name="error">Error</string>
+    <string name="record_added">Record added</string>
+
     <string name="connection_failed">Connection failed</string>
     <string name="user_not_found">User not found</string>
     <string name="key_not_valid">Key is not valid</string>
@@ -31,6 +34,7 @@
     <string name="not_verified">not verified</string>
     <string name="not_encrypted">not encrypted</string>
     <string name="date_not_correct">data isn\'t correct</string>
+    <string name="cannot_be_empty">The field cannot be empty</string>
 
 
     <string name="pass_number">Pass number</string>
