@@ -36,6 +36,14 @@
     <string name="pass_number">Pass number</string>
     <string name="room_number">Room number</string>
     <string name="password">Password</string>
+    <string name="title">Title</string>
+    <string name="hours">Hours</string>
+    <string name="time">Time</string>
+    <string name="description">Description</string>
+    <string name="time_type">Time type</string>
+    <string name="work">Work</string>
+    <string name="save">Save</string>
+
 
     // Student menu
     <string name="account">Account</string>
@@ -48,5 +56,21 @@
     <string name="student_image">student image</string>
     <string name="news_icon_image">news icon image</string>
     <string name="image_button_edit">image button edit</string>
+    <string name="image_open_spinner">image open spinner</string>
+
+
+    <string-array name="time_types">
+        <item>Hours</item>
+        <item>Minutes</item>
+    </string-array>
+
+    <string-array name="hours">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+    </string-array>
 
 </resources>

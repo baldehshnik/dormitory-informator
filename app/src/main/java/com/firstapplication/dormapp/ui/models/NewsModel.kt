@@ -7,6 +7,7 @@ data class NewsModel(
     val id: String,
     var imgSrc: String,
     var title: String,
+    var timeType: String,
     var hours: Double,
     var description: String,
     var isActive: Boolean
@@ -17,6 +18,7 @@ data class NewsModel(
         imgSrc = imgSrc,
         title = title,
         hours = hours,
+        timeType = timeType,
         description = description,
         isActive = isActive
     )
@@ -26,6 +28,7 @@ data class NewsModel(
         imgSrc = imgSrc,
         title = title,
         hours = hours,
+        timeType = timeType,
         description = description,
         isActive = isActive
     )

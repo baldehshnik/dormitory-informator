@@ -21,6 +21,9 @@ data class SavedNewsEntity(
     @ColumnInfo(name = "hours")
     var hours: Double = 0.0,
 
+    @ColumnInfo(name = "time_type")
+    var timeType: String = "",
+
     @ColumnInfo(name = "description")
     var description: String = "",
 
@@ -33,6 +36,7 @@ data class SavedNewsEntity(
         imgSrc = imgSrc,
         title = title,
         hours = hours,
+        timeType = timeType,
         description = description,
         isActive = isActive
     )

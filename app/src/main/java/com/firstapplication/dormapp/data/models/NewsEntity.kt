@@ -7,6 +7,7 @@ data class NewsEntity(
     var imgSrc: String = "",
     var title: String = "",
     var hours: Double = 0.0,
+    val timeType: String = "",
     var description: String = "",
     var isActive: Boolean = false
 ) {
@@ -16,6 +17,7 @@ data class NewsEntity(
         imgSrc = imgSrc,
         title = title,
         hours = hours,
+        timeType = timeType,
         description = description,
         isActive = isActive
     )
