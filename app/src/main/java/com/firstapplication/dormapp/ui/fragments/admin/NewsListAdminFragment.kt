@@ -15,12 +15,14 @@ import com.firstapplication.dormapp.databinding.FragmentNewsListAdminBinding
 import com.firstapplication.dormapp.ui.activity.MainActivity
 import com.firstapplication.dormapp.ui.adapters.NewsAdminAdapter
 import com.firstapplication.dormapp.ui.fragments.BasicFragment
+import com.firstapplication.dormapp.ui.interfacies.OnAdminNewsItemClickListener
+import com.firstapplication.dormapp.ui.models.NewsModel
 import com.firstapplication.dormapp.ui.viewmodels.NewsListAdminViewModel
 import com.firstapplication.dormapp.ui.viewmodels.factories.AdminViewModelFactory
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import javax.inject.Inject
 
-class NewsListAdminFragment : BasicFragment() {
+class NewsListAdminFragment : BasicFragment(), OnAdminNewsItemClickListener {
 
     private lateinit var binding: FragmentNewsListAdminBinding
 
@@ -39,11 +41,11 @@ class NewsListAdminFragment : BasicFragment() {
     ): View {
         (activity as MainActivity).activityComponent.also { it?.inject(this) }
 
-        binding = FragmentNewsListAdminBinding.inflate(layoutInflater, container, false)
+        binding = FragmentNewsListAdminBinding.inflate(inflater, container, false)
         turnOnBottomNavView(R.id.adminBottomView)
         requireActivity().findViewById<Toolbar>(R.id.toolbar).isVisible = false
 
-        val adapter = NewsAdminAdapter()
+        val adapter = NewsAdminAdapter(this)
         binding.rwNewsAdmin.adapter = adapter
 
         viewModel.news.observe(viewLifecycleOwner) { models ->
@@ -55,6 +57,23 @@ class NewsListAdminFragment : BasicFragment() {
         }
 
         return binding.root
+    }
+
+    override fun onFullItemClick(news: NewsModel) {
+        parentFragmentManager.beginTransaction()
+            .addToBackStack(null)
+            .replace(R.id.fragmentContainer, NewsInfoFragment.newInstance(news = news))
+            .commit()
+    }
+
+    override fun onEditClick(news: NewsModel) {
+        parentFragmentManager.beginTransaction()
+            .addToBackStack(null)
+            .replace(
+                R.id.fragmentContainer,
+                AddWorkFragment.newInstance(news = news)
+            )
+            .commit()
     }
 
     companion object {

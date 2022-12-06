@@ -42,11 +42,13 @@
     <string name="password">Password</string>
     <string name="title">Title</string>
     <string name="hours">Hours</string>
+    <string name="minutes">Minutes</string>
     <string name="time">Time</string>
     <string name="description">Description</string>
     <string name="time_type">Time type</string>
     <string name="work">Work</string>
     <string name="save">Save</string>
+    <string name="custom">Custom</string>
 
 
     // Student menu
@@ -69,6 +71,7 @@
     </string-array>
 
     <string-array name="hours">
+        <item>Custom</item>
         <item>1</item>
         <item>2</item>
         <item>3</item>
