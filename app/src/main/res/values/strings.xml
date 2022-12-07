@@ -49,6 +49,10 @@
     <string name="work">Work</string>
     <string name="save">Save</string>
     <string name="custom">Custom</string>
+    <string name="edited">Edited</string>
+    <string name="delete">Delete</string>
+    <string name="deleted">Deleted</string>
+    <string name="record_not_found">Record not found</string>
 
 
     // Student menu

@@ -3,7 +3,7 @@ package com.firstapplication.dormapp.data.models
 import com.firstapplication.dormapp.ui.models.NewsModel
 
 data class NewsEntity(
-    val id: String = "",
+    var id: String = "",
     var imgSrc: String = "",
     var title: String = "",
     var hours: Double = 0.0,

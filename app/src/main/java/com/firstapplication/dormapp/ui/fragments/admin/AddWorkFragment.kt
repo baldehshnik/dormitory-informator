@@ -1,6 +1,5 @@
 package com.firstapplication.dormapp.ui.fragments.admin
 
-import android.annotation.SuppressLint
 import android.content.ContentResolver
 import android.net.Uri
 import android.os.Bundle
@@ -17,26 +16,26 @@ import android.widget.Spinner
 import androidx.annotation.ArrayRes
 import androidx.annotation.DrawableRes
 import androidx.core.net.toUri
-import androidx.core.view.isInvisible
+import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import com.firstapplication.dormapp.DormApp
 import com.firstapplication.dormapp.R
 import com.firstapplication.dormapp.databinding.FragmentAddWorkBinding
 import com.firstapplication.dormapp.sealed.CorrectResult
 import com.firstapplication.dormapp.sealed.ErrorResult
+import com.firstapplication.dormapp.sealed.ChangeResult
 import com.firstapplication.dormapp.sealed.ProgressResult
 import com.firstapplication.dormapp.ui.activity.MainActivity
 import com.firstapplication.dormapp.ui.fragments.BasicFragment
 import com.firstapplication.dormapp.ui.models.NewsModel
 import com.firstapplication.dormapp.ui.viewmodels.AdminViewModel
 import com.firstapplication.dormapp.ui.viewmodels.factories.AdminViewModelFactory
-import com.google.android.material.bottomnavigation.BottomNavigationView
-import java.lang.Exception
 import javax.inject.Inject
 
 class AddWorkFragment : BasicFragment() {
 
     private var isEdit = false
+    private var deleteClick = false
 
     private lateinit var binding: FragmentAddWorkBinding
 
@@ -53,40 +52,38 @@ class AddWorkFragment : BasicFragment() {
         savedInstanceState: Bundle?
     ): View {
         (activity as MainActivity).activityComponent?.inject(this)
-
         binding = FragmentAddWorkBinding.inflate(inflater, container, false)
-        requireActivity().findViewById<BottomNavigationView>(R.id.studentBottomView).isInvisible = true
+        val news = arguments?.getParcelable<NewsModel>(NEWS_TAG)
 
         binding.btnSave.setOnClickListener {
-            saveClick()
+            changeClick(news)
         }
 
-        viewModel.createResult.observe(viewLifecycleOwner) { event ->
-            when (val result = event.getValue()) {
-                is ErrorResult -> {
-                    Log.e(this::class.java.simpleName, result.message)
-                    toast(getStringFromRes(R.string.error))
-                }
-                is CorrectResult -> {
-                    toast(getStringFromRes(R.string.record_added))
-                    binding.btnSave.isEnabled = true
-                }
-                is ProgressResult -> {
-                    binding.btnSave.isEnabled = false
-                }
-                else -> return@observe
-            }
+        binding.btnCancel.setOnClickListener {
+            parentFragmentManager.popBackStack()
+        }
+
+        binding.btnDelete.setOnClickListener {
+            onDeleteClick(news?.id ?: "")
+        }
+
+        viewModel.changedResult.observe(viewLifecycleOwner) { event ->
+            checkChangedNewsResult(event.getValue())
         }
 
         initSpinner(R.array.time_types, binding.timeTypeSpinner)
         initSpinner(R.array.hours, binding.hoursSpinner, true)
 
-        val news = arguments?.getParcelable<NewsModel>(NEWS_TAG)
         if (news != null) {
             isEdit = true
             initEditScreen(news = news)
+            switchBottomNavViewVisibility(R.id.studentBottomView, GONE)
+            switchBottomNavViewVisibility(R.id.adminBottomView, GONE)
+            binding.btnCancel.isVisible = true
+            binding.btnDelete.isVisible = true
         } else {
-            turnOnBottomNavView(R.id.adminBottomView)
+            switchBottomNavViewVisibility(R.id.adminBottomView, VISIBLE)
+            switchBottomNavViewVisibility(R.id.studentBottomView, INVISIBLE)
         }
 
         binding.etTime.addTextChangedListener(object : TextWatcher {
@@ -104,6 +101,47 @@ class AddWorkFragment : BasicFragment() {
         return binding.root
     }
 
+    private fun onDeleteClick(id: String) {
+        if (id.isBlank()) {
+            toast(getStringFromRes(R.string.record_not_found))
+        } else {
+            deleteClick = true
+            viewModel.deleteNews(id)
+            parentFragmentManager.popBackStack()
+        }
+    }
+
+    private fun checkChangedNewsResult(result: ChangeResult?) {
+        when {
+            result is ErrorResult -> {
+                Log.e(this::class.java.simpleName, result.message)
+                toast(getStringFromRes(R.string.error))
+                enableButtons()
+            }
+            result is ProgressResult -> {
+                enableButtons(false)
+            }
+            result is CorrectResult && isEdit -> {
+                toast(getStringFromRes(R.string.edited))
+                parentFragmentManager.popBackStack()
+                enableButtons()
+            }
+            result is CorrectResult -> {
+                toast(getStringFromRes(R.string.record_added))
+                enableButtons()
+            }
+            else -> {
+                return
+            }
+        }
+    }
+
+    private fun enableButtons(value: Boolean = true) {
+        binding.btnSave.isEnabled = value
+        binding.btnCancel.isEnabled = value
+        binding.btnDelete.isEnabled = value
+    }
+
     private fun setHoursSpinnerSelection(text: String) {
         try {
             val n = text.toInt()
@@ -113,7 +151,6 @@ class AddWorkFragment : BasicFragment() {
         }
     }
 
-    @SuppressLint("ResourceType")
     private fun initEditScreen(news: NewsModel) = with(binding) {
         etTitle.setText(news.title)
         etTime.setText(news.hours.toString())
@@ -171,17 +208,19 @@ class AddWorkFragment : BasicFragment() {
         }
     }
 
-    private fun saveClick() {
+    private fun changeClick(newsModel: NewsModel?) {
         if (!isBlankEditText(binding.etTitle)) return
         else if (!isBlankEditText(binding.etTime)) return
 
         val drawableRes = getDrawableByCheckedRadioButton()
         viewModel.createNews(
+            id = newsModel?.id ?: "",
             title = binding.etTitle.text.toString(),
             img = getUriFromDrawable(drawableRes),
             time = binding.etTime.text.toString(),
             timeType = binding.etTimeType.text.toString(),
-            description = binding.etDescription.text.toString()
+            description = binding.etDescription.text.toString(),
+            edit = isEdit
         )
 
         setDefaultParameters()
@@ -191,6 +230,7 @@ class AddWorkFragment : BasicFragment() {
         binding.etTitle.setText("")
         binding.etDescription.setText("")
         binding.radioGroup.check(R.id.rbWork)
+        binding.etTime.setText("")
         binding.hoursSpinner.setSelection(0)
         binding.timeTypeSpinner.setSelection(0)
     }

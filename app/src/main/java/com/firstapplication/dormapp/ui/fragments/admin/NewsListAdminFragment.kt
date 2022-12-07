@@ -42,7 +42,7 @@ class NewsListAdminFragment : BasicFragment(), OnAdminNewsItemClickListener {
         (activity as MainActivity).activityComponent.also { it?.inject(this) }
 
         binding = FragmentNewsListAdminBinding.inflate(inflater, container, false)
-        turnOnBottomNavView(R.id.adminBottomView)
+        switchBottomNavViewVisibility(R.id.adminBottomView, VISIBLE)
         requireActivity().findViewById<Toolbar>(R.id.toolbar).isVisible = false
 
         val adapter = NewsAdminAdapter(this)
