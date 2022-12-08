@@ -53,6 +53,10 @@
     <string name="delete">Delete</string>
     <string name="deleted">Deleted</string>
     <string name="record_not_found">Record not found</string>
+    <string name="respond">Respond</string>
+    <string name="show_list">Show list of rejected students</string>
+    <string name="already_registered">Already registered</string>
+    <string name="added">Added</string>
 
 
     // Student menu

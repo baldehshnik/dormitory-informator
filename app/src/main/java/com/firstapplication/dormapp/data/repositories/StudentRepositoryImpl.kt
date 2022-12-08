@@ -5,6 +5,7 @@ import com.firstapplication.dormapp.data.interfacies.SavedNewsDao
 import com.firstapplication.dormapp.data.interfacies.StudentRepository
 import com.firstapplication.dormapp.data.models.*
 import com.firstapplication.dormapp.data.remote.*
+import com.firstapplication.dormapp.sealed.*
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
@@ -29,6 +30,9 @@ class StudentRepositoryImpl @Inject constructor(
 
     private val _newsData = MutableStateFlow(listOf(NewsEntity()))
     val newsData: StateFlow<List<NewsEntity>> get() = _newsData.asStateFlow()
+
+    private val _responseResult = MutableStateFlow<SingleEvent<ResponseResult>>(SingleEvent(ProgressResponse))
+    val responseResult: StateFlow<SingleEvent<ResponseResult>> get() = _responseResult.asStateFlow()
 
     override fun checkStudentInDatabase(studentVerifyEntity: StudentVerifyEntity) {
         val rootReference = database.reference
@@ -125,5 +129,29 @@ class StudentRepositoryImpl @Inject constructor(
 
     override suspend fun readSavedNewsFromLocalDB(): List<SavedNewsEntity> {
         return newsDao.readAllSavedNews()
+    }
+
+    override suspend fun checkStudentAsWorkerOf(id: String, userPass: Int) {
+        val reference = database.reference
+            .child(PACKAGE_NEWS)
+            .child(id)
+            .child(PACKAGE_RESPONSE)
+            .child(userPass.toString())
+
+        reference.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                if (snapshot.exists()) {
+                    _responseResult.value = SingleEvent(AlreadyRegisteredResponse)
+                } else {
+                    reference.setValue(userPass)
+                    _responseResult.value = SingleEvent(CorrectResponse)
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Log.e(StudentRepositoryImpl::class.java.simpleName, error.message)
+                _responseResult.value = SingleEvent(ErrorResponse)
+            }
+        })
     }
 }

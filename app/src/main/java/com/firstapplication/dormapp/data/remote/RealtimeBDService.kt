@@ -4,6 +4,7 @@ const val databaseReference = "https://dormapptest-6243f-default-rtdb.firebaseio
 
 const val PACKAGE_USERS = "students"
 const val PACKAGE_NEWS = "news"
+const val PACKAGE_RESPONSE = "response"
 
 const val PASS_KEY = "passNumber"
 const val ROOM_KEY = "roomNumber"

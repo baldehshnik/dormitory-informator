@@ -1,6 +1,7 @@
 package com.firstapplication.dormapp.di
 
 import com.firstapplication.dormapp.ui.fragments.admin.AddWorkFragment
+import com.firstapplication.dormapp.ui.fragments.admin.NewsInfoFragment
 import com.firstapplication.dormapp.ui.fragments.admin.NewsListAdminFragment
 import com.firstapplication.dormapp.ui.fragments.login.StudentLoginFragment
 import com.firstapplication.dormapp.ui.fragments.student.AccountFragment
@@ -16,6 +17,7 @@ interface ActivitySubComponent {
     fun inject(fragment: NewsListFragment)
     fun inject(fragment: NewsListAdminFragment)
     fun inject(fragment: AddWorkFragment)
+    fun inject(fragment: NewsInfoFragment)
 
     @Subcomponent.Builder
     interface Builder {

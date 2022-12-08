@@ -5,6 +5,7 @@ import com.firstapplication.dormapp.data.interfacies.AdminRepository
 import com.firstapplication.dormapp.data.models.NewsEntity
 import com.firstapplication.dormapp.data.models.SingleEvent
 import com.firstapplication.dormapp.data.remote.PACKAGE_NEWS
+import com.firstapplication.dormapp.data.remote.PACKAGE_RESPONSE
 import com.firstapplication.dormapp.sealed.CorrectResult
 import com.firstapplication.dormapp.sealed.ChangeResult
 import com.firstapplication.dormapp.sealed.ProgressResult
@@ -25,7 +26,8 @@ class AdminRepositoryImpl @Inject constructor(
     private val _newsData = MutableStateFlow(listOf(NewsEntity()))
     val newsData: StateFlow<List<NewsEntity>> get() = _newsData.asStateFlow()
 
-    private val _changedNewsResult = MutableStateFlow<SingleEvent<ChangeResult>>(SingleEvent(ProgressResult))
+    private val _changedNewsResult =
+        MutableStateFlow<SingleEvent<ChangeResult>>(SingleEvent(ProgressResult))
     val changedNewsResult: StateFlow<SingleEvent<ChangeResult>> get() = _changedNewsResult.asStateFlow()
 
     private val changedNewsListener = object : ValueEventListener {

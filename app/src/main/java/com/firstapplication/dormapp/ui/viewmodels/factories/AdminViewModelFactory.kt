@@ -4,9 +4,11 @@ import android.app.Application
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.firstapplication.dormapp.data.interfacies.AdminRepository
+import com.firstapplication.dormapp.data.interfacies.StudentRepository
 import com.firstapplication.dormapp.di.ActivityScope
 import com.firstapplication.dormapp.ui.fragments.login.StudentLoginFragment
 import com.firstapplication.dormapp.ui.viewmodels.AdminViewModel
+import com.firstapplication.dormapp.ui.viewmodels.NewsInfoViewModel
 import com.firstapplication.dormapp.ui.viewmodels.NewsListAdminViewModel
 import com.firstapplication.dormapp.ui.viewmodels.StudentLoginViewModel
 import dagger.assisted.Assisted

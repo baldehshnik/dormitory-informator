@@ -8,4 +8,5 @@ interface StudentRepository {
     fun getVerifiedUser(studentVerifyEntity: StudentVerifyEntity)
     fun getNews()
     suspend fun readSavedNewsFromLocalDB(): List<SavedNewsEntity>
+    suspend fun checkStudentAsWorkerOf(id: String, userPass: Int)
 }
