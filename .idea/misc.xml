@@ -29,11 +29,13 @@
         <entry key="..\:/DormApp/app/src/main/res/layout/fragment_work_list.xml" value="0.25416666666666665" />
         <entry key="..\:/DormApp/app/src/main/res/layout/news_admin_item.xml" value="0.25416666666666665" />
         <entry key="..\:/DormApp/app/src/main/res/layout/news_item.xml" value="0.25416666666666665" />
+        <entry key="..\:/DormApp/app/src/main/res/layout/student_item.xml" value="0.25416666666666665" />
         <entry key="..\:/DormApp/app/src/main/res/layout/time_type_simple_spinner_dropdown.xml" value="0.25416666666666665" />
         <entry key="..\:/DormApp/app/src/main/res/layout/time_type_spinner_item.xml" value="0.25416666666666665" />
         <entry key="..\:/DormApp/app/src/main/res/layout/time_type_spinner_layout.xml" value="0.25416666666666665" />
         <entry key="..\:/DormApp/app/src/main/res/layout/time_type_spinner_text.xml" value="0.25416666666666665" />
         <entry key="..\:/DormApp/app/src/main/res/menu/admin_nav_menu.xml" value="0.25416666666666665" />
+        <entry key="..\:/DormApp/app/src/main/res/menu/student_item_menu.xml" value="0.25416666666666665" />
         <entry key="..\:/DormApp/app/src/main/res/menu/student_nav_menu.xml" value="0.25416666666666665" />
       </map>
     </option>

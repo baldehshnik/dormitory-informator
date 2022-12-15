@@ -7,4 +7,5 @@ interface AdminRepository {
     suspend fun addNews(news: NewsEntity)
     suspend fun editNews(news: NewsEntity)
     suspend fun deleteNews(id: String)
+    suspend fun readRespondingStudents(newsId: String)
 }

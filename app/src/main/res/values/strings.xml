@@ -57,6 +57,7 @@
     <string name="show_list">Show list of rejected students</string>
     <string name="already_registered">Already registered</string>
     <string name="added">Added</string>
+    <string name="pay">Pay</string>
 
 
     // Student menu
@@ -69,6 +70,7 @@
     // Content description
     <string name="student_image">student image</string>
     <string name="news_icon_image">news icon image</string>
+    <string name="student_icon_image">student icon image</string>
     <string name="image_button_edit">image button edit</string>
     <string name="image_open_spinner">image open spinner</string>
 

@@ -69,7 +69,7 @@ class NewsInfoFragment : BasicFragment() {
         }
 
         binding.btnShowList.setOnClickListener {
-            onShowListClick()
+            onShowListClick(news.id)
         }
 
         viewModel.responseResult.observe(viewLifecycleOwner) { response ->
@@ -99,10 +99,10 @@ class NewsInfoFragment : BasicFragment() {
         }
     }
 
-    private fun onShowListClick() {
+    private fun onShowListClick(newsId: String) {
         parentFragmentManager.beginTransaction()
             .addToBackStack(null)
-            .replace(R.id.fragmentContainer, RespondingStudentsListFragment.newInstance())
+            .replace(R.id.fragmentContainer, RespondingStudentsListFragment.newInstance(newsId))
             .commit()
     }
 
