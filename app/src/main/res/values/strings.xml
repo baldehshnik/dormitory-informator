@@ -18,8 +18,13 @@
     <string name="admin_key">admin</string>
 
 
+    <string name="ok">Okay</string>
     <string name="confirm">Confirm</string>
     <string name="cancel">Cancel</string>
+    <string name="register">Register</string>
+    <string name="login">Login</string>
+    <string name="name">Name</string>
+    <string name="patronymic">Patronymic</string>
 
 
     <string name="database_error">Database error</string>
@@ -31,6 +36,22 @@
     <string name="not_verified">not verified</string>
     <string name="not_encrypted">not encrypted</string>
     <string name="date_not_correct">data isn\'t correct</string>
+
+    <string name="already_registered">User already registered</string>
+    <string name="typecast_error">Typecast error</string>
+    <string name="password_is_short">Password is too short</string>
+    <string name="fields_must_be_filled">All fields must be filled</string>
+    <string name="password_encrypt_error">Password encrypt error</string>
+    <string name="user_added_for_registration">User added for registration</string>
+    <string name="registration_info_title">Registration information</string>
+
+    <string name="registration_info">
+        Your account has been added to the list of students that will be checked by the dormitory director.
+        After verification you will receive a notification that will inform weather your account has been created or not.
+    </string>
+
+    <string name="confirm_reg_title">You cannot change it.</string>
+    <string name="confirm_reg_info">Are you sure that you entered the correct information?</string>
 
 
     <string name="pass_number">Pass number</string>

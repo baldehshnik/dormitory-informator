@@ -1,9 +1,14 @@
 package com.firstapplication.dormapp.data.repositories
 
 import android.util.Log
+import com.firstapplication.dormapp.R
 import com.firstapplication.dormapp.data.interfacies.SavedNewsDao
 import com.firstapplication.dormapp.data.interfacies.StudentRepository
 import com.firstapplication.dormapp.data.models.*
+import com.firstapplication.dormapp.sealed.ChangeResponse
+import com.firstapplication.dormapp.sealed.Correct
+import com.firstapplication.dormapp.sealed.Error
+import com.firstapplication.dormapp.sealed.Progress
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
@@ -29,10 +34,13 @@ class StudentRepositoryImpl @Inject constructor(
     private val _newsData = MutableStateFlow(listOf(NewsEntity()))
     val newsData: StateFlow<List<NewsEntity>> get() = _newsData.asStateFlow()
 
+    private val _registerResponse = MutableStateFlow<ChangeResponse>(Progress)
+    val registerResponse: StateFlow<ChangeResponse> get() = _registerResponse.asStateFlow()
+
     override fun checkStudentInDatabase(studentVerifyEntity: StudentVerifyEntity) {
         val rootReference = database.reference
         val userReference =
-            rootReference.child(PACKAGE_USERS).child(studentVerifyEntity.passNumber.toString())
+            rootReference.child(PACKAGE_STUDENTS).child(studentVerifyEntity.passNumber.toString())
 
         userReference.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
@@ -60,7 +68,7 @@ class StudentRepositoryImpl @Inject constructor(
     override fun getVerifiedUser(studentVerifyEntity: StudentVerifyEntity) {
         val rootReference = database.reference
         val userReference =
-            rootReference.child(PACKAGE_USERS).child(studentVerifyEntity.passNumber.toString())
+            rootReference.child(PACKAGE_STUDENTS).child(studentVerifyEntity.passNumber.toString())
 
         userReference.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
@@ -126,9 +134,64 @@ class StudentRepositoryImpl @Inject constructor(
         return newsDao.readAllSavedNews()
     }
 
+    override suspend fun registerStudent(studentEntity: StudentEntity) {
+        _registerResponse.value = Progress
+        val reference = database.reference.child(PACKAGE_STUDENTS)
+        reference.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshots: DataSnapshot) {
+                val res = checkRegisterStudents(snapshots, studentEntity.passNumber)
+                if (!res) {
+                    checkWaitForRegistrationStudents(studentEntity)
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                setErrorRegisterResponse(error.message)
+            }
+        })
+    }
+
+    private fun checkWaitForRegistrationStudents(studentEntity: StudentEntity) {
+        val reference = database.reference.child(PACKAGE_REGISTER)
+        reference.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshots: DataSnapshot) {
+                val res = checkRegisterStudents(snapshots, studentEntity.passNumber)
+                if (!res) {
+                    database.reference.child(PACKAGE_REGISTER)
+                        .child(studentEntity.passNumber.toString())
+                        .setValue(studentEntity)
+
+                    _registerResponse.value = Correct
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                setErrorRegisterResponse(error.message)
+            }
+        })
+    }
+
+    private fun checkRegisterStudents(snapshots: DataSnapshot, passNumber: Int) : Boolean {
+        for (s in snapshots.children) {
+            val value = s.getValue(StudentEntity::class.java)
+            if (value != null && value.passNumber == passNumber) {
+                _registerResponse.value = Error(R.string.already_registered)
+                return true
+            }
+        }
+
+        return false
+    }
+
+    private fun setErrorRegisterResponse(message: String) {
+        Log.e(StudentRepositoryImpl::class.java.simpleName, message)
+        _registerResponse.value = Error(R.string.database_error)
+    }
+
     companion object {
-        private const val PACKAGE_USERS = "students"
+        private const val PACKAGE_STUDENTS = "students"
         private const val PACKAGE_NEWS = "news"
+        private const val PACKAGE_REGISTER = "register"
 
         private const val PASS_KEY = "passNumber"
         private const val ROOM_KEY = "roomNumber"

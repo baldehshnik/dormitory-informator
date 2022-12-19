@@ -7,6 +7,7 @@ import com.firstapplication.dormapp.data.repositories.StudentRepositoryImpl
 import com.firstapplication.dormapp.ui.viewmodels.StudentLoginViewModel
 import com.firstapplication.dormapp.ui.viewmodels.AccountViewModel
 import com.firstapplication.dormapp.ui.viewmodels.NewsListViewModel
+import com.firstapplication.dormapp.ui.viewmodels.StudentRegisterViewModel
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -27,8 +28,14 @@ class StudentViewModelFactory @AssistedInject constructor(
             modelClass.isAssignableFrom(StudentLoginViewModel::class.java) -> initStudentLoginViewModel()
             modelClass.isAssignableFrom(AccountViewModel::class.java) -> initStudentViewModel()
             modelClass.isAssignableFrom(NewsListViewModel::class.java) -> initNewsListViewModel()
+            modelClass.isAssignableFrom(StudentRegisterViewModel::class.java) -> initStudentRegisterViewModelAsT()
             else -> throw IllegalArgumentException("view model not found")
         }
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    private fun <T: ViewModel> initStudentRegisterViewModelAsT(): T {
+        return StudentRegisterViewModel(application = application, repository = repository) as T
     }
 
     @Suppress("UNCHECKED_CAST")

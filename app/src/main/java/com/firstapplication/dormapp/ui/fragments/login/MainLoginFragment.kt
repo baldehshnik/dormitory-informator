@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.setFragmentResultListener
 import com.firstapplication.dormapp.R
@@ -33,10 +34,23 @@ class MainLoginFragment : Fragment(R.layout.fragment_main_login) {
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
         binding = FragmentMainLoginBinding.inflate(layoutInflater, container, false)
+
+        binding.btnCancel.setOnClickListener { changeStudentLayout(false) }
+        binding.btnStudent.setOnClickListener { changeStudentLayout(true) }
+
         binding.btnAdmin.setOnClickListener { openAdminLoginFragment() }
-        binding.btnStudent.setOnClickListener { openStudentLoginFragment() }
+        binding.btnLogin.setOnClickListener { openStudentLoginFragment() }
+        binding.btnRegister.setOnClickListener { openStudentRegisterFragment() }
 
         return binding.root
+    }
+
+    private fun changeStudentLayout(visibility: Boolean) = with(binding) {
+        btnAdmin.isVisible = !visibility
+        btnStudent.isVisible = !visibility
+        btnLogin.isVisible = visibility
+        btnRegister.isVisible = visibility
+        btnCancel.isVisible = visibility
     }
 
     private fun changeDefaultFragmentToAdmin(key: Boolean) {
@@ -65,6 +79,13 @@ class MainLoginFragment : Fragment(R.layout.fragment_main_login) {
             .commit()
     }
 
+    private fun openStudentRegisterFragment() {
+        parentFragmentManager.beginTransaction()
+            .addToBackStack(null)
+            .replace(R.id.fragmentContainer, StudentRegisterFragment.newInstance())
+            .commit()
+    }
+
     companion object {
         const val ADMIN_LOGIN_KEY = "ADMIN_FRAGMENT_LISTENER"
         const val STUDENT_LOGIN_KEY = "STUDENT_FRAGMENT_LISTENER"
@@ -75,5 +96,4 @@ class MainLoginFragment : Fragment(R.layout.fragment_main_login) {
             return MainLoginFragment()
         }
     }
-
 }

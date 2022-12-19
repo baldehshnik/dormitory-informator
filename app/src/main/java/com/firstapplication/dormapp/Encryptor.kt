@@ -19,7 +19,6 @@ class Encryptor {
             digest = messageDigest.digest()
         } catch (e: NoSuchAlgorithmException) {
             Log.e(this::class.java.simpleName, e.message ?: e.stackTraceToString())
-            e.printStackTrace()
             return null
         }
 

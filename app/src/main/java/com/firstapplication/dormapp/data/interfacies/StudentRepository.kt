@@ -1,6 +1,7 @@
 package com.firstapplication.dormapp.data.interfacies
 
 import com.firstapplication.dormapp.data.models.SavedNewsEntity
+import com.firstapplication.dormapp.data.models.StudentEntity
 import com.firstapplication.dormapp.data.models.StudentVerifyEntity
 
 interface StudentRepository {
@@ -8,4 +9,5 @@ interface StudentRepository {
     fun getVerifiedUser(studentVerifyEntity: StudentVerifyEntity)
     fun getNews()
     suspend fun readSavedNewsFromLocalDB(): List<SavedNewsEntity>
+    suspend fun registerStudent(studentEntity: StudentEntity)
 }

@@ -12,6 +12,7 @@ import com.firstapplication.dormapp.DormApp
 import com.firstapplication.dormapp.Encryptor
 import com.firstapplication.dormapp.R
 import com.firstapplication.dormapp.databinding.FragmentStudentLoginBinding
+import com.firstapplication.dormapp.extensions.saveStudent
 import com.firstapplication.dormapp.ui.activity.MainActivity
 import com.firstapplication.dormapp.ui.fragments.BasicFragment
 import com.firstapplication.dormapp.ui.fragments.login.MainLoginFragment.Companion.STUDENT_INIT
@@ -73,17 +74,24 @@ class StudentLoginFragment : BasicFragment() {
     private fun checkVerifiedUser(result: Int) {
         when (result) {
             1 -> {
-                val sharedPreferences = requireActivity().getSharedPreferences(MainActivity.LOGIN_USER_PREF, Context.MODE_PRIVATE)
+                val sharedPreferences = requireActivity().getSharedPreferences(
+                    MainActivity.LOGIN_USER_PREF,
+                    Context.MODE_PRIVATE
+                )
 
-                val passStr = binding.etPassNumber.text?.toString() ?: ""
-                val roomStr = binding.etRoomNumber.text?.toString() ?: ""
-                val password = binding.etPassword.text?.toString() ?: ""
+                val passStr = binding.etPassNumber.text.toString()
+                val roomStr = binding.etRoomNumber.text.toString()
+                val password = Encryptor().toEncrypt(
+                    binding.etPassword.text.toString()
+                ) ?: getStringFromRes(R.string.not_encrypted)
 
-                sharedPreferences.edit()
-                    .putString(MainActivity.LOGIN_KEY, passStr)
-                    .putInt(ROOM_KEY, roomStr.toInt())
-                    .putString(PASSWORD_KEY, Encryptor().toEncrypt(password) ?: getStringFromRes(R.string.not_encrypted))
-                    .apply()
+                sharedPreferences.saveStudent(passStr, roomStr, password)
+
+//                sharedPreferences.edit()
+//                    .putString(MainActivity.LOGIN_KEY, passStr)
+//                    .putInt(ROOM_KEY, roomStr.toInt())
+//                    .putString(PASSWORD_KEY, Encryptor().toEncrypt(password) ?: getStringFromRes(R.string.not_encrypted))
+//                    .apply()
 
                 parentFragmentManager.setFragmentResult(STUDENT_LOGIN_KEY, bundleOf(
                     STUDENT_INIT to true, PASS_KEY to passStr.toInt())
@@ -93,7 +101,7 @@ class StudentLoginFragment : BasicFragment() {
             -1 -> {
                 toast(getStringFromRes(R.string.not_verified))
             }
-            else -> {
+            -2 -> {
                 toast(getStringFromRes(R.string.database_error))
             }
         }
