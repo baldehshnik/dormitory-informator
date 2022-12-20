@@ -1,5 +1,6 @@
 package com.firstapplication.dormapp.ui.fragments.login
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -31,6 +32,7 @@ class StudentRegisterFragment : BasicFragment() {
         factory.create(activity?.application as DormApp)
     }
 
+    @SuppressLint("UnspecifiedImmutableFlag")
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -40,7 +42,9 @@ class StudentRegisterFragment : BasicFragment() {
         binding = FragmentRegisterStudentBinding.inflate(inflater, container, false)
 
         binding.btnRegister.setOnClickListener { onRegisterClick() }
-        binding.btnCancel.setOnClickListener { onCancelClick() }
+        binding.btnCancel.setOnClickListener {
+            onCancelClick()
+        }
 
         viewModel.registerResponse.observe(viewLifecycleOwner) { response ->
             when (response) {

@@ -5,6 +5,7 @@ import com.firstapplication.dormapp.R
 import com.firstapplication.dormapp.data.interfacies.SavedNewsDao
 import com.firstapplication.dormapp.data.interfacies.StudentRepository
 import com.firstapplication.dormapp.data.models.*
+import com.firstapplication.dormapp.enums.ConfirmedRegistration
 import com.firstapplication.dormapp.sealed.ChangeResponse
 import com.firstapplication.dormapp.sealed.Correct
 import com.firstapplication.dormapp.sealed.Error
@@ -39,16 +40,14 @@ class StudentRepositoryImpl @Inject constructor(
 
     override fun checkStudentInDatabase(studentVerifyEntity: StudentVerifyEntity) {
         val rootReference = database.reference
-        val userReference =
-            rootReference.child(PACKAGE_STUDENTS).child(studentVerifyEntity.passNumber.toString())
+        val userReference = rootReference.child(PACKAGE_STUDENTS).child(studentVerifyEntity.passNumber.toString())
 
         userReference.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 if (dataSnapshot.exists()) {
                     val passNumber = dataSnapshot.child(PASS_KEY).getValue(Int::class.java) ?: 0
                     val roomNumber = dataSnapshot.child(ROOM_KEY).getValue(Int::class.java) ?: 0
-                    val password =
-                        dataSnapshot.child(PASSWORD_KEY).getValue(String::class.java) ?: ""
+                    val password = dataSnapshot.child(PASSWORD_KEY).getValue(String::class.java) ?: ""
 
                     val user = StudentVerifyEntity(passNumber, roomNumber, password)
                     if (user != studentVerifyEntity) _verifiedUser.value = SingleEvent(value = -1)
@@ -75,8 +74,7 @@ class StudentRepositoryImpl @Inject constructor(
                 if (dataSnapshot.exists()) {
                     val passNumber = dataSnapshot.child(PASS_KEY).getValue(Int::class.java) ?: 0
                     val roomNumber = dataSnapshot.child(ROOM_KEY).getValue(Int::class.java) ?: 0
-                    val password =
-                        dataSnapshot.child(PASSWORD_KEY).getValue(String::class.java) ?: ""
+                    val password = dataSnapshot.child(PASSWORD_KEY).getValue(String::class.java) ?: ""
 
                     val user = StudentVerifyEntity(passNumber, roomNumber, password)
                     if (user != studentVerifyEntity) {
@@ -88,8 +86,7 @@ class StudentRepositoryImpl @Inject constructor(
                             password = password
                         )
 
-                        val fullName =
-                            dataSnapshot.child(FULL_NAME_KEY).getValue(String::class.java)
+                        val fullName = dataSnapshot.child(FULL_NAME_KEY).getValue(String::class.java)
                         val hours = dataSnapshot.child(HOURS_KEY).getValue(Double::class.java)
 
                         if (fullName != null) studentEntity.fullName = fullName
@@ -161,6 +158,11 @@ class StudentRepositoryImpl @Inject constructor(
                         .child(studentEntity.passNumber.toString())
                         .setValue(studentEntity)
 
+                    database.reference.child(PACKAGE_REGISTER)
+                        .child(studentEntity.passNumber.toString())
+                        .child(CONFIRMED)
+                        .setValue(ConfirmedRegistration.EMPTY.value)
+
                     _registerResponse.value = Correct
                 }
             }
@@ -189,14 +191,15 @@ class StudentRepositoryImpl @Inject constructor(
     }
 
     companion object {
-        private const val PACKAGE_STUDENTS = "students"
-        private const val PACKAGE_NEWS = "news"
-        private const val PACKAGE_REGISTER = "register"
+        const val PACKAGE_STUDENTS = "students"
+        const val PACKAGE_NEWS = "news"
+        const val PACKAGE_REGISTER = "register"
 
-        private const val PASS_KEY = "passNumber"
-        private const val ROOM_KEY = "roomNumber"
-        private const val PASSWORD_KEY = "password"
-        private const val FULL_NAME_KEY = "fullName"
-        private const val HOURS_KEY = "hours"
+        const val PASS_KEY = "passNumber"
+        const val ROOM_KEY = "roomNumber"
+        const val PASSWORD_KEY = "password"
+        const val FULL_NAME_KEY = "fullName"
+        const val HOURS_KEY = "hours"
+        const val CONFIRMED = "confirmed"
     }
 }
