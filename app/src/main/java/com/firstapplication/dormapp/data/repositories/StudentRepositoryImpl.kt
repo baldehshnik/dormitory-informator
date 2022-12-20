@@ -39,21 +39,18 @@ class StudentRepositoryImpl @Inject constructor(
     val registerResponse: StateFlow<ChangeResponse> get() = _registerResponse.asStateFlow()
 
     override fun checkStudentInDatabase(studentVerifyEntity: StudentVerifyEntity) {
-        val rootReference = database.reference
-        val userReference = rootReference.child(PACKAGE_STUDENTS).child(studentVerifyEntity.passNumber.toString())
+        val reference = database.reference
+            .child(PACKAGE_STUDENTS)
+            .child(studentVerifyEntity.passNumber.toString())
 
-        userReference.addListenerForSingleValueEvent(object : ValueEventListener {
-            override fun onDataChange(dataSnapshot: DataSnapshot) {
-                if (dataSnapshot.exists()) {
-                    val passNumber = dataSnapshot.child(PASS_KEY).getValue(Int::class.java) ?: 0
-                    val roomNumber = dataSnapshot.child(ROOM_KEY).getValue(Int::class.java) ?: 0
-                    val password = dataSnapshot.child(PASSWORD_KEY).getValue(String::class.java) ?: ""
-
-                    val user = StudentVerifyEntity(passNumber, roomNumber, password)
-                    if (user != studentVerifyEntity) _verifiedUser.value = SingleEvent(value = -1)
+        reference.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                if (snapshot.exists()) {
+                    val user = getReadStudentVerifyEntity(snapshot)
+                    if (user != studentVerifyEntity) checkNotRegisteredStudents(studentVerifyEntity)
                     else _verifiedUser.value = SingleEvent(value = 1)
                 } else {
-                    _verifiedUser.value = SingleEvent(value = -1)
+                    checkNotRegisteredStudents(studentVerifyEntity)
                 }
             }
 
@@ -173,7 +170,7 @@ class StudentRepositoryImpl @Inject constructor(
         })
     }
 
-    private fun checkRegisterStudents(snapshots: DataSnapshot, passNumber: Int) : Boolean {
+    private fun checkRegisterStudents(snapshots: DataSnapshot, passNumber: Int): Boolean {
         for (s in snapshots.children) {
             val value = s.getValue(StudentEntity::class.java)
             if (value != null && value.passNumber == passNumber) {
@@ -188,6 +185,36 @@ class StudentRepositoryImpl @Inject constructor(
     private fun setErrorRegisterResponse(message: String) {
         Log.e(StudentRepositoryImpl::class.java.simpleName, message)
         _registerResponse.value = Error(R.string.database_error)
+    }
+
+    private fun checkNotRegisteredStudents(entity: StudentVerifyEntity) {
+        val reference = database.reference
+            .child(PACKAGE_REGISTER)
+            .child(entity.passNumber.toString())
+
+        reference.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                if (snapshot.exists()) {
+                    val user = getReadStudentVerifyEntity(snapshot)
+                    if (user != entity) _verifiedUser.value = SingleEvent(value = -1)
+                    else _verifiedUser.value = SingleEvent(value = 2)
+                } else {
+                    _verifiedUser.value = SingleEvent(value = -1)
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Log.e(StudentRepositoryImpl::class.java.simpleName, error.message)
+                _verifiedUser.value = SingleEvent(value = -2)
+            }
+        })
+    }
+
+    private fun getReadStudentVerifyEntity(snapshot: DataSnapshot): StudentVerifyEntity {
+        val passNumber = snapshot.child(PASS_KEY).getValue(Int::class.java) ?: 0
+        val roomNumber = snapshot.child(ROOM_KEY).getValue(Int::class.java) ?: 0
+        val password = snapshot.child(PASSWORD_KEY).getValue(String::class.java) ?: ""
+        return StudentVerifyEntity(passNumber, roomNumber, password)
     }
 
     companion object {

@@ -33,7 +33,9 @@
     <string name="key_not_valid">Key is not valid</string>
     <string name="user_saved">User was saved</string>
     <string name="verified">verified</string>
-    <string name="not_verified">not verified</string>
+    <string name="not_verified">Failed to login</string>
+    <string name="not_verified_title">Not verified</string>
+
     <string name="not_encrypted">not encrypted</string>
     <string name="date_not_correct">data isn\'t correct</string>
 
@@ -52,6 +54,10 @@
 
     <string name="confirm_reg_title">You cannot change it.</string>
     <string name="confirm_reg_info">Are you sure that you entered the correct information?</string>
+
+    <string name="not_verified_info">
+        Your account has not yet been verified. Please wait a moment.
+    </string>
 
 
     <string name="pass_number">Pass number</string>

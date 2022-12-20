@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AlertDialog
 import androidx.core.os.bundleOf
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -47,10 +48,7 @@ class StudentLoginFragment : BasicFragment() {
                 val roomStr = binding.etRoomNumber.text?.toString() ?: ""
                 val password =binding.etPassword.text?.toString() ?: ""
                 clickConfirm(passStr = passStr, roomStr = roomStr, password = password)
-
-                etPassNumber.isEnabled = false
-                etRoomNumber.isEnabled = false
-                etPassword.isEnabled = false
+                switchEditTexts(value = false)
             }
             btnCancel.setOnClickListener {
                 parentFragmentManager.popBackStack()
@@ -58,11 +56,11 @@ class StudentLoginFragment : BasicFragment() {
         }
 
         lifecycleScope.launchWhenCreated {
-            withContext(Dispatchers.Main) {
-                binding.progressBar.visibility = View.GONE
-            }
-
             viewModel.verifiedUser.collect {
+                withContext(Dispatchers.Main) {
+                    binding.progressBar.visibility = View.GONE
+                }
+
                 val result = it.getValue() ?: return@collect
                 checkVerifiedUser(result)
             }
@@ -71,8 +69,23 @@ class StudentLoginFragment : BasicFragment() {
         return binding.root
     }
 
+    private fun switchEditTexts(value: Boolean) = with(binding) {
+        etPassNumber.isEnabled = value
+        etRoomNumber.isEnabled = value
+        etPassword.isEnabled = value
+    }
+
     private fun checkVerifiedUser(result: Int) {
         when (result) {
+            2 -> {
+                AlertDialog.Builder(requireContext())
+                    .setIcon(R.drawable.ic_baseline_info)
+                    .setTitle(R.string.not_verified_title)
+                    .setMessage(R.string.not_verified_info)
+                    .setPositiveButton(R.string.ok, null)
+                    .create()
+                    .show()
+            }
             1 -> {
                 val sharedPreferences = requireActivity().getSharedPreferences(
                     MainActivity.LOGIN_USER_PREF,
@@ -99,16 +112,14 @@ class StudentLoginFragment : BasicFragment() {
                 parentFragmentManager.popBackStack()
             }
             -1 -> {
-                toast(getStringFromRes(R.string.not_verified))
+                snackBar(binding.etPassNumber, getStringFromRes(R.string.not_verified))
             }
             -2 -> {
-                toast(getStringFromRes(R.string.database_error))
+                snackBar(binding.etPassNumber, getStringFromRes(R.string.database_error))
             }
         }
 
-        binding.etPassNumber.isEnabled = true
-        binding.etRoomNumber.isEnabled = true
-        binding.etPassword.isEnabled = true
+        switchEditTexts(true)
     }
 
     private fun clickConfirm(passStr: String, roomStr: String, password: String) {
