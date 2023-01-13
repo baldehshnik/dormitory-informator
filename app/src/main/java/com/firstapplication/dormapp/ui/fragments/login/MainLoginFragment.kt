@@ -8,7 +8,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.setFragmentResultListener
 import com.firstapplication.dormapp.R
 import com.firstapplication.dormapp.databinding.FragmentMainLoginBinding
-import com.firstapplication.dormapp.ui.fragments.admin.AddWorkFragment
+import com.firstapplication.dormapp.ui.fragments.admin.ConfirmStudentsFragment
 import com.firstapplication.dormapp.ui.fragments.login.StudentLoginFragment.Companion.PASS_KEY
 import com.firstapplication.dormapp.ui.fragments.student.AccountFragment
 
@@ -41,7 +41,7 @@ class MainLoginFragment : Fragment(R.layout.fragment_main_login) {
 
     private fun changeDefaultFragmentToAdmin(key: Boolean) {
         if (key) parentFragmentManager.beginTransaction()
-            .add(R.id.fragmentContainer, AddWorkFragment.newInstance())
+            .add(R.id.fragmentContainer, ConfirmStudentsFragment.newInstance())
             .remove(this@MainLoginFragment)
             .commit()
     }

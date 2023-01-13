@@ -8,6 +8,7 @@ import com.firstapplication.dormapp.data.interfacies.AdminRepository
 import com.firstapplication.dormapp.data.models.StudentEntity
 import com.firstapplication.dormapp.data.repositories.AdminRepositoryImpl
 import com.firstapplication.dormapp.di.ActivityScope
+import com.firstapplication.dormapp.extensions.checkListTypeIsStudentEntity
 import com.firstapplication.dormapp.sealed.Correct
 import com.firstapplication.dormapp.sealed.Empty
 import com.firstapplication.dormapp.sealed.Error
@@ -54,19 +55,12 @@ class RespondingStudentListViewModel(
     @Suppress("UNCHECKED_CAST")
     private fun isStudentsList(result: Correct<*>) {
         val res = result.value
-        val isStudentEntitiesList = checkResultTypeIsStudentEntity(res)
+        val isStudentEntitiesList = checkListTypeIsStudentEntity(res)
         when {
             res.isEmpty() -> _respondingStudentsResult.value = Empty
             isStudentEntitiesList -> migrateStudentsEntities(res as List<StudentEntity>)
             else -> _respondingStudentsResult.value = Error
         }
-    }
-
-    private fun checkResultTypeIsStudentEntity(result: List<Any>): Boolean {
-        result.forEach {
-            if (it !is StudentEntity) return false
-        }
-        return true
     }
 
     override fun onCleared() {

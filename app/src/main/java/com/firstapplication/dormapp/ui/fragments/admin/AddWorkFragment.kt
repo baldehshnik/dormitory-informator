@@ -29,7 +29,7 @@ import com.firstapplication.dormapp.ui.activity.MainActivity
 import com.firstapplication.dormapp.ui.fragments.BasicFragment
 import com.firstapplication.dormapp.ui.models.NewsModel
 import com.firstapplication.dormapp.ui.viewmodels.AdminViewModel
-import com.firstapplication.dormapp.ui.viewmodels.factories.AdminViewModelFactory
+import com.firstapplication.dormapp.ui.viewmodels.factories.AdminVMFactory
 import javax.inject.Inject
 
 class AddWorkFragment : BasicFragment() {
@@ -40,11 +40,9 @@ class AddWorkFragment : BasicFragment() {
     private lateinit var binding: FragmentAddWorkBinding
 
     @Inject
-    lateinit var factory: AdminViewModelFactory.Factory
+    lateinit var factory: AdminVMFactory
 
-    private val viewModel: AdminViewModel by viewModels {
-        factory.create(activity?.application as DormApp)
-    }
+    private val viewModel: AdminViewModel by viewModels { factory }
 
     override fun onCreateView(
         inflater: LayoutInflater,

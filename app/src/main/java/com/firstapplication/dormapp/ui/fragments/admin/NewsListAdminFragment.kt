@@ -5,11 +5,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.widget.Toolbar
-import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
-import com.firstapplication.dormapp.DormApp
 import com.firstapplication.dormapp.R
 import com.firstapplication.dormapp.databinding.FragmentNewsListAdminBinding
 import com.firstapplication.dormapp.ui.activity.MainActivity
@@ -18,8 +15,7 @@ import com.firstapplication.dormapp.ui.fragments.BasicFragment
 import com.firstapplication.dormapp.ui.interfacies.OnAdminNewsItemClickListener
 import com.firstapplication.dormapp.ui.models.NewsModel
 import com.firstapplication.dormapp.ui.viewmodels.NewsListAdminViewModel
-import com.firstapplication.dormapp.ui.viewmodels.factories.AdminViewModelFactory
-import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.firstapplication.dormapp.ui.viewmodels.factories.AdminVMFactory
 import javax.inject.Inject
 
 class NewsListAdminFragment : BasicFragment(), OnAdminNewsItemClickListener {
@@ -27,11 +23,9 @@ class NewsListAdminFragment : BasicFragment(), OnAdminNewsItemClickListener {
     private lateinit var binding: FragmentNewsListAdminBinding
 
     @Inject
-    lateinit var factory: AdminViewModelFactory.Factory
+    lateinit var factory: AdminVMFactory
 
-    private val viewModel: NewsListAdminViewModel by viewModels {
-        factory.create(activity?.application as DormApp)
-    }
+    private val viewModel: NewsListAdminViewModel by viewModels { factory }
 
     @SuppressLint("CutPasteId")
     override fun onCreateView(
@@ -43,7 +37,6 @@ class NewsListAdminFragment : BasicFragment(), OnAdminNewsItemClickListener {
 
         binding = FragmentNewsListAdminBinding.inflate(inflater, container, false)
         switchBottomNavViewVisibility(R.id.adminBottomView, VISIBLE)
-        requireActivity().findViewById<Toolbar>(R.id.toolbar).isVisible = false
 
         val adapter = NewsAdminAdapter(this)
         binding.rwNewsAdmin.adapter = adapter
@@ -52,8 +45,6 @@ class NewsListAdminFragment : BasicFragment(), OnAdminNewsItemClickListener {
             adapter.submitList(models)
             binding.progressBarNewsAdmin.isVisible = false
             binding.rwNewsAdmin.isVisible = true
-            requireActivity().findViewById<Toolbar>(R.id.toolbar).isVisible = true
-            requireActivity().findViewById<BottomNavigationView>(R.id.studentBottomView).isInvisible = true
         }
 
         return binding.root

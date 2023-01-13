@@ -6,11 +6,14 @@
         <entry key="..\:/Android Projects/app/src/main/res/layout/activity_login_choice.xml" value="0.25416666666666665" />
         <entry key="..\:/Android Projects/app/src/main/res/layout/fragment_main_login.xml" value="0.25416666666666665" />
         <entry key="..\:/Android Projects/app/src/main/res/layout/fragment_student_login.xml" value="0.25416666666666665" />
+        <entry key="..\:/DormApp/app/src/main/res/drawable/corn.xml" value="0.2703125" />
         <entry key="..\:/DormApp/app/src/main/res/drawable/ic_baseline_account.xml" value="0.2703125" />
         <entry key="..\:/DormApp/app/src/main/res/drawable/ic_baseline_add.xml" value="0.2703125" />
+        <entry key="..\:/DormApp/app/src/main/res/drawable/ic_baseline_app_registration.xml" value="0.2703125" />
         <entry key="..\:/DormApp/app/src/main/res/drawable/ic_baseline_card.xml" value="0.2703125" />
         <entry key="..\:/DormApp/app/src/main/res/drawable/ic_baseline_edit.xml" value="0.2703125" />
         <entry key="..\:/DormApp/app/src/main/res/drawable/ic_baseline_home.xml" value="0.2703125" />
+        <entry key="..\:/DormApp/app/src/main/res/drawable/ic_baseline_not_interested.xml" value="0.2703125" />
         <entry key="..\:/DormApp/app/src/main/res/drawable/ic_baseline_room.xml" value="0.2703125" />
         <entry key="..\:/DormApp/app/src/main/res/drawable/ic_key.xml" value="0.2703125" />
         <entry key="..\:/DormApp/app/src/main/res/drawable/spinner_background.xml" value="0.2703125" />
@@ -19,6 +22,8 @@
         <entry key="..\:/DormApp/app/src/main/res/layout/fragment_account.xml" value="0.25416666666666665" />
         <entry key="..\:/DormApp/app/src/main/res/layout/fragment_add_work.xml" value="0.25416666666666665" />
         <entry key="..\:/DormApp/app/src/main/res/layout/fragment_admin_login.xml" value="0.25416666666666665" />
+        <entry key="..\:/DormApp/app/src/main/res/layout/fragment_confiirm_students.xml" value="0.25416666666666665" />
+        <entry key="..\:/DormApp/app/src/main/res/layout/fragment_confirm_students.xml" value="0.25416666666666665" />
         <entry key="..\:/DormApp/app/src/main/res/layout/fragment_main_login.xml" value="0.25416666666666665" />
         <entry key="..\:/DormApp/app/src/main/res/layout/fragment_news_edit.xml" value="0.25416666666666665" />
         <entry key="..\:/DormApp/app/src/main/res/layout/fragment_news_info.xml" value="0.25416666666666665" />
@@ -29,6 +34,8 @@
         <entry key="..\:/DormApp/app/src/main/res/layout/fragment_work_list.xml" value="0.25416666666666665" />
         <entry key="..\:/DormApp/app/src/main/res/layout/news_admin_item.xml" value="0.25416666666666665" />
         <entry key="..\:/DormApp/app/src/main/res/layout/news_item.xml" value="0.25416666666666665" />
+        <entry key="..\:/DormApp/app/src/main/res/layout/not_confirmed_student_item.xml" value="0.25416666666666665" />
+        <entry key="..\:/DormApp/app/src/main/res/layout/some.xml" value="0.25416666666666665" />
         <entry key="..\:/DormApp/app/src/main/res/layout/student_item.xml" value="0.25416666666666665" />
         <entry key="..\:/DormApp/app/src/main/res/layout/time_type_simple_spinner_dropdown.xml" value="0.25416666666666665" />
         <entry key="..\:/DormApp/app/src/main/res/layout/time_type_spinner_item.xml" value="0.25416666666666665" />

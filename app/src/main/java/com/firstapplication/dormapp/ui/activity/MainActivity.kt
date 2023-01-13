@@ -9,6 +9,7 @@ import com.firstapplication.dormapp.databinding.ActivityLoginBinding
 import com.firstapplication.dormapp.di.ActivitySubComponent
 import com.firstapplication.dormapp.extensions.appComponent
 import com.firstapplication.dormapp.ui.fragments.admin.AddWorkFragment
+import com.firstapplication.dormapp.ui.fragments.admin.ConfirmStudentsFragment
 import com.firstapplication.dormapp.ui.fragments.admin.NewsListAdminFragment
 import com.firstapplication.dormapp.ui.fragments.login.MainLoginFragment
 import com.firstapplication.dormapp.ui.fragments.student.AccountFragment
@@ -46,9 +47,13 @@ class MainActivity : AppCompatActivity() {
         }
 
         binding.adminBottomView.setOnItemSelectedListener {
-            when(it.itemId) {
-                R.id.itemAdd -> navigate(ADD_NEWS_TAG, null)
-                R.id.itemNewsListAdmin -> navigate(NEWS_ADMIN_FRAGMENT_TAG, NewsListAdminFragment.newInstance())
+            when (it.itemId) {
+                R.id.itemConfirmStudents -> navigate(CONFIRM_STUDENTS_TAG, null)
+                R.id.itemAdd -> navigate(ADD_NEWS_TAG, AddWorkFragment.newInstance())
+                R.id.itemNewsListAdmin -> navigate(
+                    NEWS_ADMIN_FRAGMENT_TAG,
+                    NewsListAdminFragment.newInstance()
+                )
             }
 
             return@setOnItemSelectedListener true
@@ -56,21 +61,34 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onBackPressed() {
-        super.onBackPressed()
-        when {
-            supportFragmentManager.findFragmentByTag(NEWS_FRAGMENT_TAG)?.isVisible == true -> {
-                binding.studentBottomView.selectedItemId = R.id.itemNewsList
-            }
-            supportFragmentManager.findFragmentByTag(ACCOUNT_FRAGMENT_TAG)?.isVisible == true -> {
-                binding.studentBottomView.selectedItemId = R.id.itemAccount
-                supportFragmentManager.popBackStack()
-            }
-            supportFragmentManager.findFragmentByTag(NEWS_ADMIN_FRAGMENT_TAG)?.isVisible == true -> {
-                binding.adminBottomView.selectedItemId = R.id.itemNewsListAdmin
-            }
-            supportFragmentManager.findFragmentByTag(ADD_NEWS_TAG)?.isVisible == true -> {
-                binding.adminBottomView.selectedItemId = R.id.itemAdd
-                supportFragmentManager.popBackStack()
+        val isNewsAdminVisible = supportFragmentManager.findFragmentByTag(NEWS_ADMIN_FRAGMENT_TAG)?.isVisible
+        val isAddNewsVisible = supportFragmentManager.findFragmentByTag(ADD_NEWS_TAG)?.isVisible
+
+        if (
+            (isNewsAdminVisible == true || isAddNewsVisible == true) &&
+            supportFragmentManager.backStackEntryCount == 2
+        ) {
+            supportFragmentManager.popBackStack()
+        } else {
+            super.onBackPressed()
+            when {
+                supportFragmentManager.findFragmentByTag(NEWS_FRAGMENT_TAG)?.isVisible == true -> {
+                    binding.studentBottomView.selectedItemId = R.id.itemNewsList
+                }
+                supportFragmentManager.findFragmentByTag(ACCOUNT_FRAGMENT_TAG)?.isVisible == true -> {
+                    binding.studentBottomView.selectedItemId = R.id.itemAccount
+                    supportFragmentManager.popBackStack()
+                }
+
+                supportFragmentManager.findFragmentByTag(NEWS_ADMIN_FRAGMENT_TAG)?.isVisible == true -> {
+                    binding.adminBottomView.selectedItemId = R.id.itemNewsListAdmin
+                }
+                supportFragmentManager.findFragmentByTag(ADD_NEWS_TAG)?.isVisible == true -> {
+                    binding.adminBottomView.selectedItemId = R.id.itemAdd
+                }
+                supportFragmentManager.findFragmentByTag(CONFIRM_STUDENTS_TAG)?.isVisible == true -> {
+                    binding.adminBottomView.selectedItemId = R.id.itemConfirmStudents
+                }
             }
         }
     }
@@ -82,10 +100,15 @@ class MainActivity : AppCompatActivity() {
 
     private fun navigate(tag: String, newFragment: Fragment?) {
         val fragment = supportFragmentManager.findFragmentByTag(tag)
-        if (fragment != null) {
+        if (fragment != null && tag != CONFIRM_STUDENTS_TAG) {
             supportFragmentManager.beginTransaction()
+                .addToBackStack(null)
                 .replace(R.id.fragmentContainer, fragment, tag)
                 .commit()
+        } else if (fragment != null && tag == CONFIRM_STUDENTS_TAG) {
+            repeat(supportFragmentManager.backStackEntryCount) {
+                supportFragmentManager.popBackStack()
+            }
         } else {
             supportFragmentManager.beginTransaction()
                 .addToBackStack(null)
@@ -108,13 +131,21 @@ class MainActivity : AppCompatActivity() {
 
     private fun openAdminFragment() {
         supportFragmentManager.beginTransaction()
-            .add(R.id.fragmentContainer, AddWorkFragment.newInstance(), ADD_NEWS_TAG)
+            .add(
+                R.id.fragmentContainer,
+                ConfirmStudentsFragment.newInstance(),
+                CONFIRM_STUDENTS_TAG
+            )
             .commit()
     }
 
     private fun openStudentFragment(key: Int) {
         supportFragmentManager.beginTransaction()
-            .add(R.id.fragmentContainer, AccountFragment.newInstance(key = key), ACCOUNT_FRAGMENT_TAG)
+            .add(
+                R.id.fragmentContainer,
+                AccountFragment.newInstance(key = key),
+                ACCOUNT_FRAGMENT_TAG
+            )
             .commit()
     }
 
@@ -131,6 +162,7 @@ class MainActivity : AppCompatActivity() {
         const val NEWS_FRAGMENT_TAG = "NEWS_LIST_TAG"
         const val ACCOUNT_FRAGMENT_TAG = "ACCOUNT_FRAGMENT_TAG"
 
+        const val CONFIRM_STUDENTS_TAG = "CONFIRM_STUDENT_TAG"
         const val ADD_NEWS_TAG = "ADD_NEWS_TAG"
         const val NEWS_ADMIN_FRAGMENT_TAG = "NEWS_ADMIN_FRAGMENT_TAG"
     }

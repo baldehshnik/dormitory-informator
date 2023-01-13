@@ -1,17 +1,16 @@
 package com.firstapplication.dormapp.ui.viewmodels
 
-import android.app.Application
 import android.net.Uri
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.firstapplication.dormapp.data.interfacies.AdminRepository
 import com.firstapplication.dormapp.data.models.SingleEvent
 import com.firstapplication.dormapp.data.repositories.AdminRepositoryImpl
 import com.firstapplication.dormapp.di.ActivityScope
-import com.firstapplication.dormapp.sealed.ErrorResult
 import com.firstapplication.dormapp.sealed.ChangeResult
+import com.firstapplication.dormapp.sealed.ErrorResult
 import com.firstapplication.dormapp.ui.models.NewsModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -22,9 +21,8 @@ typealias LiveInsertResult = LiveData<SingleEvent<ChangeResult>>
 
 @ActivityScope
 class AdminViewModel(
-    application: Application,
     private val adminRepository: AdminRepository
-) : AndroidViewModel(application) {
+) : ViewModel() {
 
     private val _changedResult = MutableLiveInsertResult()
     val changedResult: LiveInsertResult = _changedResult

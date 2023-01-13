@@ -35,6 +35,17 @@
     <string name="not_encrypted">not encrypted</string>
     <string name="date_not_correct">data isn\'t correct</string>
     <string name="cannot_be_empty">The field cannot be empty</string>
+    <string name="student_confirmed">The student has been confirmed</string>
+    <string name="student_not_confirmed">The student has not been confirmed</string>
+    <string name="attention">Attention</string>
+
+    <string name="to_confirm_reg_dialog">
+        Are you sure you want to confirm registration of %s?
+    </string>
+
+    <string name="to_cancel_reg_dialog">
+        Are you sure you want to cancel registration of %s?
+    </string>
 
 
     <string name="pass_number">Pass number</string>
@@ -58,6 +69,7 @@
     <string name="already_registered">Already registered</string>
     <string name="added">Added</string>
     <string name="pay">Pay</string>
+    <string name="students">Students</string>
 
 
     // Student menu

@@ -1,10 +1,6 @@
 package com.firstapplication.dormapp.ui.viewmodels
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import com.firstapplication.dormapp.data.interfacies.AdminRepository
 import com.firstapplication.dormapp.data.repositories.AdminRepositoryImpl
 import com.firstapplication.dormapp.di.ActivityScope
@@ -15,9 +11,8 @@ import kotlinx.coroutines.withContext
 
 @ActivityScope
 class NewsListAdminViewModel(
-    application: Application,
     private val repository: AdminRepository
-) : AndroidViewModel(application) {
+) : ViewModel() {
 
     private val _news = MutableLiveData<List<NewsModel>>()
     val news: LiveData<List<NewsModel>> get() = _news
