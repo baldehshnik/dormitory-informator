@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/itemConfirm"
+        android:icon="@drawable/ic_baseline_check_circle"
+        android:title="@string/pay" />
+
+    <item
+        android:id="@+id/itemCancel"
+        android:icon="@drawable/ic_baseline_close"
+        android:title="@string/cancel" />
+
+</menu>

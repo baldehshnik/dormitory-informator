@@ -2,7 +2,6 @@ package com.firstapplication.dormapp.di
 
 import android.content.Context
 import androidx.room.Room
-import androidx.room.RoomDatabase
 import com.firstapplication.dormapp.data.interfacies.SavedNewsDao
 import com.firstapplication.dormapp.data.local.NewsDatabase
 import com.firstapplication.dormapp.data.local.NewsDatabase.Companion.DATABASE_NAME
@@ -16,6 +15,7 @@ import javax.inject.Singleton
 @Module
 object AppModule {
 
+    @Singleton
     @Provides
     fun provideRealtimeDatabase(): FirebaseDatabase {
         return Firebase.database

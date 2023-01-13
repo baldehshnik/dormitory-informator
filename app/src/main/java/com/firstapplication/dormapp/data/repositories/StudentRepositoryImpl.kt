@@ -7,9 +7,11 @@ import com.firstapplication.dormapp.data.interfacies.StudentRepository
 import com.firstapplication.dormapp.data.models.*
 import com.firstapplication.dormapp.enums.ConfirmedRegistration
 import com.firstapplication.dormapp.sealed.ChangeResponse
-import com.firstapplication.dormapp.sealed.Correct
-import com.firstapplication.dormapp.sealed.Error
-import com.firstapplication.dormapp.sealed.Progress
+import com.firstapplication.dormapp.sealed.CorrectSelect
+import com.firstapplication.dormapp.sealed.ErrorSelect
+import com.firstapplication.dormapp.sealed.ProgressSelect
+import com.firstapplication.dormapp.data.remote.*
+import com.firstapplication.dormapp.sealed.*
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
@@ -37,6 +39,23 @@ class StudentRepositoryImpl @Inject constructor(
 
     private val _registerResponse = MutableStateFlow<ChangeResponse>(Progress)
     val registerResponse: StateFlow<ChangeResponse> get() = _registerResponse.asStateFlow()
+
+    private val _responseResult = MutableStateFlow<SingleEvent<ResponseResult>>(SingleEvent(ProgressResponse))
+    val responseResult: StateFlow<SingleEvent<ResponseResult>> get() = _responseResult.asStateFlow()
+
+//    override fun checkStudentInDatabase(studentVerifyEntity: StudentVerifyEntity) {
+//        val rootReference = database.reference
+//        val userReference =
+//            rootReference.child(PACKAGE_USERS).child(studentVerifyEntity.passNumber.toString())
+//
+//        userReference.addListenerForSingleValueEvent(object : ValueEventListener {
+//            override fun onDataChange(dataSnapshot: DataSnapshot) {
+//                if (dataSnapshot.exists()) {
+//                    val passNumber = dataSnapshot.child(PASS_KEY).getValue(Int::class.java) ?: 0
+//                    val roomNumber = dataSnapshot.child(ROOM_KEY).getValue(Int::class.java) ?: 0
+//                    val password =
+//                        dataSnapshot.child(PASSWORD_KEY).getValue(String::class.java) ?: ""
+//>>>>>>> admin
 
     override fun checkStudentInDatabase(studentVerifyEntity: StudentVerifyEntity) {
         val reference = database.reference
@@ -206,6 +225,30 @@ class StudentRepositoryImpl @Inject constructor(
             override fun onCancelled(error: DatabaseError) {
                 Log.e(StudentRepositoryImpl::class.java.simpleName, error.message)
                 _verifiedUser.value = SingleEvent(value = -2)
+            }
+        })
+    }
+
+    override suspend fun checkStudentAsWorkerOf(id: String, userPass: Int) {
+        val reference = database.reference
+            .child(PACKAGE_NEWS)
+            .child(id)
+            .child(PACKAGE_RESPONSE)
+            .child(userPass.toString())
+
+        reference.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                if (snapshot.exists()) {
+                    _responseResult.value = SingleEvent(AlreadyRegisteredResponse)
+                } else {
+                    reference.setValue(userPass)
+                    _responseResult.value = SingleEvent(CorrectResponse)
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Log.e(StudentRepositoryImpl::class.java.simpleName, error.message)
+                _responseResult.value = SingleEvent(ErrorResponse)
             }
         })
     }

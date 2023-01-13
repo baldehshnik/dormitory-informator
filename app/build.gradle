@@ -31,6 +31,7 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
     }
     kotlinOptions {
+        freeCompilerArgs = ['-Xjvm-default=enable']
         jvmTarget = '1.8'
     }
     buildFeatures {
@@ -44,6 +45,7 @@ ext {
     navigationVersion = "2.5.3"
     daggerVersion = "2.44.2"
     roomVersion = "2.4.3"
+    glideVersion = "4.14.2"
 }
 
 dependencies {
@@ -82,4 +84,8 @@ dependencies {
     implementation  "androidx.room:room-ktx:$roomVersion"
     implementation "androidx.room:room-runtime:$roomVersion"
     kapt("androidx.room:room-compiler:$roomVersion")
+
+    // Glide
+    implementation "com.github.bumptech.glide:glide:$glideVersion"
+    annotationProcessor "com.github.bumptech.glide:compiler:$glideVersion"
 }

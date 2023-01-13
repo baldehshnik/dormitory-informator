@@ -10,4 +10,5 @@ interface StudentRepository {
     fun getNews()
     suspend fun readSavedNewsFromLocalDB(): List<SavedNewsEntity>
     suspend fun registerStudent(studentEntity: StudentEntity)
+    suspend fun checkStudentAsWorkerOf(id: String, userPass: Int)
 }

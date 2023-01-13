@@ -28,6 +28,9 @@
 
 
     <string name="database_error">Database error</string>
+    <string name="error">Error</string>
+    <string name="record_added">Record added</string>
+
     <string name="connection_failed">Connection failed</string>
     <string name="user_not_found">User not found</string>
     <string name="key_not_valid">Key is not valid</string>
@@ -38,8 +41,19 @@
 
     <string name="not_encrypted">not encrypted</string>
     <string name="date_not_correct">data isn\'t correct</string>
+    <string name="cannot_be_empty">The field cannot be empty</string>
+    <string name="student_confirmed">The student has been confirmed</string>
+    <string name="student_not_confirmed">The student has not been confirmed</string>
+    <string name="attention">Attention</string>
 
-    <string name="already_registered">User already registered</string>
+    <string name="to_confirm_reg_dialog">
+        Are you sure you want to confirm registration of %s?
+    </string>
+
+    <string name="to_cancel_reg_dialog">
+        Are you sure you want to cancel registration of %s?
+    </string>
+
     <string name="typecast_error">Typecast error</string>
     <string name="password_is_short">Password is too short</string>
     <string name="fields_must_be_filled">All fields must be filled</string>
@@ -49,7 +63,6 @@
 
     <string name="registration_info">
         Your account has been added to the list of students that will be checked by the dormitory director.
-        After verification you will receive a notification that will inform weather your account has been created or not.
     </string>
 
     <string name="confirm_reg_title">You cannot change it.</string>
@@ -63,13 +76,55 @@
     <string name="pass_number">Pass number</string>
     <string name="room_number">Room number</string>
     <string name="password">Password</string>
+    <string name="title">Title</string>
+    <string name="hours">Hours</string>
+    <string name="minutes">Minutes</string>
+    <string name="time">Time</string>
+    <string name="description">Description</string>
+    <string name="time_type">Time type</string>
+    <string name="work">Work</string>
+    <string name="save">Save</string>
+    <string name="custom">Custom</string>
+    <string name="edited">Edited</string>
+    <string name="delete">Delete</string>
+    <string name="deleted">Deleted</string>
+    <string name="record_not_found">Record not found</string>
+    <string name="respond">Respond</string>
+    <string name="show_list">Show list of rejected students</string>
+    <string name="already_registered">Already registered</string>
+    <string name="added">Added</string>
+    <string name="pay">Pay</string>
+    <string name="students">Students</string>
+
 
     // Student menu
     <string name="account">Account</string>
     <string name="news">News</string>
 
+    // Admin menu
+    <string name="add">Add</string>
+
     // Content description
     <string name="student_image">student image</string>
     <string name="news_icon_image">news icon image</string>
+    <string name="student_icon_image">student icon image</string>
+    <string name="image_button_edit">image button edit</string>
+    <string name="image_open_spinner">image open spinner</string>
+
+
+    <string-array name="time_types">
+        <item>Hours</item>
+        <item>Minutes</item>
+    </string-array>
+
+    <string-array name="hours">
+        <item>Custom</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+    </string-array>
 
 </resources>

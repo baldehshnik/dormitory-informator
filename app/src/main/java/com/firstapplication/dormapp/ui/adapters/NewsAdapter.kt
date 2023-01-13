@@ -31,13 +31,3 @@ class NewsAdapter : ListAdapter<NewsModel, NewsAdapter.NewsViewHolder>(NewsDiffU
     }
 
 }
-
-class NewsDiffUtil : DiffUtil.ItemCallback<NewsModel>() {
-    override fun areItemsTheSame(oldItem: NewsModel, newItem: NewsModel): Boolean {
-        return oldItem == newItem
-    }
-
-    override fun areContentsTheSame(oldItem: NewsModel, newItem: NewsModel): Boolean {
-        return oldItem.id == newItem.id
-    }
-}

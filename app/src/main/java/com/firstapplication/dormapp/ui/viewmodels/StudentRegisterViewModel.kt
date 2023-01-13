@@ -13,7 +13,6 @@ import com.firstapplication.dormapp.data.repositories.StudentRepositoryImpl
 import com.firstapplication.dormapp.di.ActivityScope
 import com.firstapplication.dormapp.sealed.ChangeResponse
 import com.firstapplication.dormapp.sealed.Correct
-import com.firstapplication.dormapp.sealed.Error
 import com.firstapplication.dormapp.ui.models.StudentModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.transformWhile
@@ -75,7 +74,7 @@ class StudentRegisterViewModel(
 
     private suspend fun setErrorResponse(@StringRes message: Int) {
         withContext(Dispatchers.Main) {
-            _registerResponse.value = Error(message)
+            _registerResponse.value = com.firstapplication.dormapp.sealed.Error(message)
         }
     }
 

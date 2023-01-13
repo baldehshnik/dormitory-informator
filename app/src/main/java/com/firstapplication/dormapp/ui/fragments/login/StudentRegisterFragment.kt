@@ -11,9 +11,7 @@ import androidx.fragment.app.viewModels
 import com.firstapplication.dormapp.DormApp
 import com.firstapplication.dormapp.R
 import com.firstapplication.dormapp.databinding.FragmentRegisterStudentBinding
-import com.firstapplication.dormapp.sealed.Correct
-import com.firstapplication.dormapp.sealed.Error
-import com.firstapplication.dormapp.sealed.Progress
+import com.firstapplication.dormapp.sealed.*
 import com.firstapplication.dormapp.ui.activity.MainActivity
 import com.firstapplication.dormapp.ui.fragments.BasicFragment
 import com.firstapplication.dormapp.ui.viewmodels.StudentRegisterViewModel
