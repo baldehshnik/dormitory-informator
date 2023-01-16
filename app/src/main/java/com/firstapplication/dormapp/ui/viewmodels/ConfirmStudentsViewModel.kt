@@ -9,6 +9,7 @@ import com.firstapplication.dormapp.data.models.StudentEntity
 import com.firstapplication.dormapp.data.repositories.AdminRepositoryImpl
 import com.firstapplication.dormapp.extensions.checkListTypeIsStudentEntity
 import com.firstapplication.dormapp.sealed.*
+import com.firstapplication.dormapp.ui.models.StudentModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.transformWhile
 import kotlinx.coroutines.launch
@@ -30,9 +31,9 @@ class ConfirmStudentsViewModel(
         }
     }
 
-    fun confirmStudent(pass: String) {
+    fun confirmStudent(model: StudentModel) {
         viewModelScope.launch(Dispatchers.IO) {
-            repository.confirmStudent(pass)
+            repository.confirmStudent(model.migrateToStudentEntity())
             setConfirmResultListener()
         }
     }

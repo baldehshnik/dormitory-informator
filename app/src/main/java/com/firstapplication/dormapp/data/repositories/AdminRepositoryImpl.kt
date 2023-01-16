@@ -6,6 +6,7 @@ import com.firstapplication.dormapp.data.models.NewsEntity
 import com.firstapplication.dormapp.data.models.SingleEvent
 import com.firstapplication.dormapp.data.models.StudentEntity
 import com.firstapplication.dormapp.data.remote.*
+import com.firstapplication.dormapp.enums.ConfirmedRegistration
 import com.firstapplication.dormapp.sealed.*
 import com.google.firebase.database.*
 import com.google.firebase.database.ktx.getValue
@@ -118,9 +119,12 @@ class AdminRepositoryImpl @Inject constructor(
                 val students = mutableListOf<StudentEntity>()
                 for (s in snapshot.children) {
                     val value = s.getValue<StudentEntity>()
-                    if (value != null) students.add(value)
+                    val confirm = s.child(CONFIRM).getValue<Int>()
+                    if (value != null && confirm == ConfirmedRegistration.EMPTY.value) {
+                        students.add(value)
+                    }
                 }
-                readOnlyNotConfirmedStudents(reference, students)
+                _notRegisteredStudentsResult.value = CorrectSelect(students)
             }
 
             override fun onCancelled(error: DatabaseError) {
@@ -130,12 +134,20 @@ class AdminRepositoryImpl @Inject constructor(
         })
     }
 
-    override suspend fun confirmStudent(pass: String) {
-        setConfirmValue(pass, 1)
+    override suspend fun confirmStudent(entity: StudentEntity) {
+        val pass = entity.passNumber.toString()
+        database.reference.child(PACKAGE_USERS).child(pass).setValue(entity)
+        _confirmResult.value = CorrectResult
+        database.reference.child(PACKAGE_REGISTER).child(pass).removeValue()
     }
 
     override suspend fun cancelStudent(pass: String) {
-        setConfirmValue(pass, -1)
+        database.reference.child(PACKAGE_REGISTER)
+            .child(pass)
+            .child(CONFIRM)
+            .setValue(ConfirmedRegistration.NOT_CONFIRMED.value)
+
+        _confirmResult.value = CorrectResult
     }
 
     fun clearRespondingStudentsResult() {
@@ -145,7 +157,7 @@ class AdminRepositoryImpl @Inject constructor(
     private fun readRespondingStudentsByIds(list: List<Int>) {
         val studentsList = mutableListOf<StudentEntity>()
         if (list.isEmpty()) {
-            _respondingStudents.value = CorrectSelect<List<StudentEntity>>(studentsList)
+            _respondingStudents.value = CorrectSelect(studentsList)
             return
         }
 
@@ -161,7 +173,9 @@ class AdminRepositoryImpl @Inject constructor(
                     if (value != null) studentsList.add(value)
 
                     n++
-                    setCorrectChangeResult(list, n, _respondingStudents, studentsList)
+                    if (n == list.size) {
+                        _respondingStudents.value = CorrectSelect(studentsList)
+                    }
                 }
 
                 override fun onCancelled(error: DatabaseError) {
@@ -178,60 +192,6 @@ class AdminRepositoryImpl @Inject constructor(
         reference.apply {
             setValue(news)
             addValueEventListener(changedNewsListener)
-        }
-    }
-
-    private fun setConfirmValue(pass: String, value: Int) {
-        val reference = database.reference.child(PACKAGE_REGISTER).child(pass).child(CONFIRM)
-        reference.setValue(value)
-        _confirmResult.value = CorrectResult
-    }
-
-    private fun setCorrectChangeResult(
-        defValue: List<Any>,
-        size: Int,
-        listener: MutableStateFlow<SelectResult>,
-        value: List<Any>
-    ) {
-        if (size == defValue.size) {
-            listener.value = CorrectSelect(value)
-        }
-    }
-
-    private fun readOnlyNotConfirmedStudents(
-        rootReference: DatabaseReference,
-        students: List<StudentEntity>
-    ) {
-        if (students.isEmpty()) {
-            _notRegisteredStudentsResult.value = CorrectSelect(students)
-            return
-        }
-
-        var n = 0
-        var isError = false
-        val resultList = mutableListOf<StudentEntity>()
-        for (st in students) {
-            if (isError) return
-
-            val reference = rootReference.child(st.passNumber.toString()).child(CONFIRM)
-            reference.addListenerForSingleValueEvent(object : ValueEventListener {
-                override fun onDataChange(snapshot: DataSnapshot) {
-                    val isConfirmed = snapshot.getValue<Int>()
-
-                    Log.i("MAMA", isConfirmed.toString())
-
-                    if (isConfirmed == 0) resultList.add(students[n])
-
-                    n++
-                    setCorrectChangeResult(students, n, _notRegisteredStudentsResult, resultList)
-                }
-
-                override fun onCancelled(error: DatabaseError) {
-                    Log.e(this@AdminRepositoryImpl::class.java.simpleName, error.message)
-                    isError = true
-                    _notRegisteredStudentsResult.value = ErrorSelect
-                }
-            })
         }
     }
 }

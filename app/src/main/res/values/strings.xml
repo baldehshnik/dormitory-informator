@@ -72,6 +72,12 @@
         Your account has not yet been verified. Please wait a moment.
     </string>
 
+    <string name="not_verified_deleted">
+        Your account has not been verified by an administrator.
+        Please check your data and submit your request again.\n\n
+        <b>This message will not be shown again!</b>
+    </string>
+
 
     <string name="pass_number">Pass number</string>
     <string name="room_number">Room number</string>

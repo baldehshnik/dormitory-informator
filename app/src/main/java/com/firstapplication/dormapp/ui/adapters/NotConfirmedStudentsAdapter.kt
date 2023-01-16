@@ -30,26 +30,33 @@ class NotConfirmedStudentsAdapter(
                 showDialog(
                     context,
                     context.resources.getString(R.string.to_confirm_reg_dialog, student.fullName),
-                    pass
+                    model = student
                 )
             }
             btnCancel.setOnClickListener {
                 showDialog(
                     context,
                     context.resources.getString(R.string.to_cancel_reg_dialog, student.fullName),
-                    pass
+                    pass = pass
                 )
             }
             root.setOnClickListener { listener.onItemClick(pass, adapterPosition) }
         }
 
-        private fun showDialog(context: Context, message: String, pass: String) {
+        private fun showDialog(
+            context: Context, message: String,
+            pass: String? = null, model: StudentModel? = null
+        ) {
             AlertDialog.Builder(context)
                 .setIcon(R.drawable.ic_baseline_info)
                 .setTitle(R.string.attention)
                 .setMessage(message)
                 .setPositiveButton(R.string.confirm) { _, _ ->
-                    listener.onConfirmClick(pass, adapterPosition)
+                    if (pass == null) {
+                        listener.onConfirmClick(model ?: return@setPositiveButton, adapterPosition)
+                    } else {
+                        listener.onCancelClick(pass, adapterPosition)
+                    }
                 }
                 .setNegativeButton(R.string.cancel, null)
                 .create()

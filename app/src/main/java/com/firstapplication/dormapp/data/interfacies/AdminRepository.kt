@@ -1,6 +1,7 @@
 package com.firstapplication.dormapp.data.interfacies
 
 import com.firstapplication.dormapp.data.models.NewsEntity
+import com.firstapplication.dormapp.data.models.StudentEntity
 
 interface AdminRepository {
     suspend fun readNewsFromDB()
@@ -9,6 +10,6 @@ interface AdminRepository {
     suspend fun deleteNews(id: String)
     suspend fun readRespondingStudents(newsId: String)
     suspend fun readNotRegisteredStudents()
-    suspend fun confirmStudent(pass: String)
+    suspend fun confirmStudent(entity: StudentEntity)
     suspend fun cancelStudent(pass: String)
 }

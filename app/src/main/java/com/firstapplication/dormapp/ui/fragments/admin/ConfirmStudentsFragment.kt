@@ -116,10 +116,10 @@ class ConfirmStudentsFragment : BasicFragment(), OnNotConfirmedStudentItemClickL
         TODO("not implemented")
     }
 
-    override fun onConfirmClick(pass: String, position: Int) {
+    override fun onConfirmClick(model: StudentModel, position: Int) {
         selectedItem = position
         onConfirmClick = true
-        viewModel.confirmStudent(pass)
+        viewModel.confirmStudent(model)
     }
 
     override fun onCancelClick(pass: String, position: Int) {
