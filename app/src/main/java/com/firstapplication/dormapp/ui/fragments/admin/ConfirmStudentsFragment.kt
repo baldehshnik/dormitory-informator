@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AlertDialog
 import androidx.core.view.isVisible
 import androidx.core.view.size
 import androidx.fragment.app.viewModels
@@ -15,6 +16,7 @@ import com.firstapplication.dormapp.ui.adapters.NotConfirmedStudentsAdapter
 import com.firstapplication.dormapp.ui.fragments.BasicFragment
 import com.firstapplication.dormapp.ui.interfacies.OnNotConfirmedStudentItemClickListener
 import com.firstapplication.dormapp.ui.models.StudentModel
+import com.firstapplication.dormapp.ui.models.StudentModel.Companion.NAME_DELIMITER
 import com.firstapplication.dormapp.ui.viewmodels.ConfirmStudentsViewModel
 import com.firstapplication.dormapp.ui.viewmodels.factories.AdminVMFactory
 import com.google.android.material.snackbar.Snackbar
@@ -61,7 +63,11 @@ class ConfirmStudentsFragment : BasicFragment(), OnNotConfirmedStudentItemClickL
     private fun handleReadStudentsResult(result: SelectResult) {
         when (result) {
             is ErrorSelect -> {
-                Snackbar.make(binding.rwNotConfirmedStudents, "error", Snackbar.LENGTH_SHORT).show()
+                Snackbar.make(
+                    binding.rwNotConfirmedStudents,
+                    getStringFromRes(R.string.error),
+                    Snackbar.LENGTH_SHORT
+                ).show()
                 changeLayoutVisibility(isProgress = false)
             }
             is ProgressSelect -> {
@@ -111,9 +117,28 @@ class ConfirmStudentsFragment : BasicFragment(), OnNotConfirmedStudentItemClickL
         onConfirmClick = null
     }
 
-    override fun onItemClick(pass: String, position: Int) {
+    override fun onItemClick(model: StudentModel, position: Int) {
         selectedItem = position
-        TODO("not implemented")
+        val nameParams = model.fullName.split(NAME_DELIMITER)
+        AlertDialog.Builder(requireContext())
+            .setCancelable(true)
+            .setPositiveButton(R.string.validate) { _, _ ->
+                onConfirmClick(model, position)
+            }
+            .setNegativeButton(R.string.invalidate) { _, _ ->
+                onCancelClick(model.passNumber.toString(), position)
+            }
+            .setNeutralButton(R.string.ok, null)
+            .setIcon(R.drawable.ic_baseline_info)
+            .setTitle(R.string.student_info)
+            .setMessage(
+                resources.getString(
+                    R.string.student_info_format, nameParams[0], nameParams[1], nameParams[2],
+                    model.passNumber.toString(), model.roomNumber.toString(), model.hours.toString()
+                )
+            )
+            .create()
+            .show()
     }
 
     override fun onConfirmClick(model: StudentModel, position: Int) {

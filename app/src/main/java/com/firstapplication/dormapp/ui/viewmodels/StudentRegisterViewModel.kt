@@ -14,6 +14,7 @@ import com.firstapplication.dormapp.di.ActivityScope
 import com.firstapplication.dormapp.sealed.ChangeResponse
 import com.firstapplication.dormapp.sealed.Correct
 import com.firstapplication.dormapp.ui.models.StudentModel
+import com.firstapplication.dormapp.ui.models.StudentModel.Companion.NAME_DELIMITER
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.transformWhile
 import kotlinx.coroutines.launch
@@ -54,7 +55,7 @@ class StudentRegisterViewModel(
 
                 registerStudentInDatabase(
                     studentModel = StudentModel(
-                        fullName = "$surname $name $patronymic",
+                        fullName = "$surname$NAME_DELIMITER$name$NAME_DELIMITER$patronymic",
                         password = encryptedPassword,
                         passNumber = passNumber.toInt(),
                         roomNumber = roomNumber.toInt(),

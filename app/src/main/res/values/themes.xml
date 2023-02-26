@@ -21,6 +21,4 @@
     <style name="Theme.DormApp.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
     <style name="Theme.DormApp.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
-
-
 </resources>

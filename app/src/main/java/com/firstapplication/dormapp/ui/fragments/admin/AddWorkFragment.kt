@@ -18,12 +18,11 @@ import androidx.annotation.DrawableRes
 import androidx.core.net.toUri
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
-import com.firstapplication.dormapp.DormApp
 import com.firstapplication.dormapp.R
 import com.firstapplication.dormapp.databinding.FragmentAddWorkBinding
+import com.firstapplication.dormapp.sealed.ChangeResult
 import com.firstapplication.dormapp.sealed.CorrectResult
 import com.firstapplication.dormapp.sealed.ErrorResult
-import com.firstapplication.dormapp.sealed.ChangeResult
 import com.firstapplication.dormapp.sealed.ProgressResult
 import com.firstapplication.dormapp.ui.activity.MainActivity
 import com.firstapplication.dormapp.ui.fragments.BasicFragment
@@ -75,13 +74,11 @@ class AddWorkFragment : BasicFragment() {
         if (news != null) {
             isEdit = true
             initEditScreen(news = news)
-            switchBottomNavViewVisibility(R.id.studentBottomView, GONE)
             switchBottomNavViewVisibility(R.id.adminBottomView, GONE)
             binding.btnCancel.isVisible = true
             binding.btnDelete.isVisible = true
         } else {
             switchBottomNavViewVisibility(R.id.adminBottomView, VISIBLE)
-            switchBottomNavViewVisibility(R.id.studentBottomView, INVISIBLE)
         }
 
         binding.etTime.addTextChangedListener(object : TextWatcher {

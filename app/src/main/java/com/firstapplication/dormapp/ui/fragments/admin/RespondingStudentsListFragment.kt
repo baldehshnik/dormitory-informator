@@ -21,8 +21,10 @@ import javax.inject.Inject
 
 class RespondingStudentsListFragment : BasicFragment(), OnStudentItemClickListener {
 
-    private lateinit var binding: FragmentRespondingStudentsListBinding
+    private var selectedItem = -1
+    private var currentAction: Int? = null
 
+    private lateinit var binding: FragmentRespondingStudentsListBinding
     private lateinit var adapter: StudentAdapter
 
     @Inject
@@ -40,22 +42,62 @@ class RespondingStudentsListFragment : BasicFragment(), OnStudentItemClickListen
         (activity as MainActivity).activityComponent?.inject(this)
         binding = FragmentRespondingStudentsListBinding.inflate(inflater, container, false)
 
-        adapter = StudentAdapter(this)
-        binding.rwRespondingStudents.adapter = adapter
-
         viewModel.respondingStudentsResult.observe(viewLifecycleOwner) { result ->
             checkRespondingStudentsResult(result)
+        }
+
+        viewModel.confirmStudentResponse.observe(viewLifecycleOwner) { result ->
+            handleStudentsConfirmResult(result)
         }
 
         return binding.root
     }
 
-    override fun onConfirmClick(student: StudentModel) {
-        TODO("Not yet implemented")
+    override fun onConfirmClick(student: StudentModel, selectedItem: Int) {
+        val newsId = getCurrentNews(selectedItem) ?: return
+        currentAction = confirmAction
+        viewModel.confirmStudentResponse(newsId, student)
     }
 
-    override fun onCancelClick(passNumber: Int) {
-        TODO("Not yet implemented")
+    override fun onCancelClick(passNumber: Int, selectedItem: Int) {
+        val newsId = getCurrentNews(selectedItem) ?: return
+        currentAction = cancelAction
+        viewModel.cancelStudentResponse(newsId, passNumber)
+    }
+
+    private fun getCurrentNews(selectedItem: Int): String? {
+        val newsId = arguments?.getString(NEWS_ID) ?: ""
+        if (newsId.isBlank()) {
+            toast(getStringFromRes(R.string.news_not_found))
+            return null
+        }
+        this.selectedItem = selectedItem
+        return newsId
+    }
+
+    private fun handleStudentsConfirmResult(result: ChangeResult) {
+        when (result) {
+            ProgressResult -> return
+            is ErrorResult -> {
+                toast(getStringFromRes(R.string.error))
+            }
+            CorrectResult -> {
+                adapter.removeSelectedItem(selectedItem)
+                handleCurrentAction()
+            }
+        }
+        selectedItem = -1
+        currentAction = null
+    }
+
+    private fun handleCurrentAction() {
+        toast(
+            when (currentAction) {
+                confirmAction -> getStringFromRes(R.string.user_confirmed)
+                cancelAction -> getStringFromRes(R.string.user_canceled)
+                else -> return
+            }
+        )
     }
 
     @Suppress("UNCHECKED_CAST")
@@ -77,7 +119,8 @@ class RespondingStudentsListFragment : BasicFragment(), OnStudentItemClickListen
             }
             is CorrectSelect<*> -> {
                 changeLayout(progressBarVisibility = false)
-                adapter.submitList(result.value as List<StudentModel>)
+                adapter = StudentAdapter(this, result.value as MutableList<StudentModel>)
+                binding.rwRespondingStudents.adapter = adapter
             }
         }
     }
@@ -94,6 +137,12 @@ class RespondingStudentsListFragment : BasicFragment(), OnStudentItemClickListen
 
     companion object {
         private const val NEWS_ID = "NEWS ID"
+
+        @JvmStatic
+        private val confirmAction = 1
+
+        @JvmStatic
+        private val cancelAction = -1
 
         @JvmStatic
         fun newInstance(newsId: String): RespondingStudentsListFragment {

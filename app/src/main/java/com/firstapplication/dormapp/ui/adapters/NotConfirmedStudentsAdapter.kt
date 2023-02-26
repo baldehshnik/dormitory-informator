@@ -1,14 +1,16 @@
 package com.firstapplication.dormapp.ui.adapters
 
+import android.app.AlertDialog
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.firstapplication.dormapp.R
 import com.firstapplication.dormapp.databinding.NotConfirmedStudentItemBinding
 import com.firstapplication.dormapp.ui.interfacies.OnNotConfirmedStudentItemClickListener
 import com.firstapplication.dormapp.ui.models.StudentModel
+import com.firstapplication.dormapp.ui.models.StudentModel.Companion.NAME_DELIMITER
 
 class NotConfirmedStudentsAdapter(
     private val listener: OnNotConfirmedStudentItemClickListener,
@@ -21,8 +23,14 @@ class NotConfirmedStudentsAdapter(
     ) : RecyclerView.ViewHolder(binding.root) {
 
         fun bind(student: StudentModel) = with(binding) {
-            twStudentName.text = student.fullName
+            twStudentName.text = student.fullName.split(NAME_DELIMITER).joinToString(" ")
             twRoomNumber.text = student.roomNumber.toString()
+
+            Glide.with(imgStudentIcon)
+                .load(student.imgSrc)
+                .fallback(R.drawable.ic_baseline_no_image)
+                .placeholder(R.drawable.ic_baseline_no_image)
+                .into(imgStudentIcon)
 
             val pass = student.passNumber.toString()
             val context = root.context
@@ -40,7 +48,7 @@ class NotConfirmedStudentsAdapter(
                     pass = pass
                 )
             }
-            root.setOnClickListener { listener.onItemClick(pass, adapterPosition) }
+            root.setOnClickListener { listener.onItemClick(student, adapterPosition) }
         }
 
         private fun showDialog(
@@ -58,7 +66,7 @@ class NotConfirmedStudentsAdapter(
                         listener.onCancelClick(pass, adapterPosition)
                     }
                 }
-                .setNegativeButton(R.string.cancel, null)
+                .setNegativeButton(R.string.close, null)
                 .create()
                 .show()
         }

@@ -2,7 +2,6 @@ package com.firstapplication.dormapp.ui.models
 
 import android.os.Parcelable
 import com.firstapplication.dormapp.data.models.NewsEntity
-import com.firstapplication.dormapp.data.models.SavedNewsEntity
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
@@ -17,16 +16,6 @@ data class NewsModel(
 ) : Parcelable {
 
     fun migrateToNewsEntity() = NewsEntity(
-        id = id,
-        imgSrc = imgSrc,
-        title = title,
-        hours = hours,
-        timeType = timeType,
-        description = description,
-        isActive = isActive
-    )
-
-    fun migrateToSavedNewsEntity() = SavedNewsEntity(
         id = id,
         imgSrc = imgSrc,
         title = title,

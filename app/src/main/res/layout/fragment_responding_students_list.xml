@@ -18,6 +18,7 @@
         android:layout_width="128dp"
         android:layout_height="128dp"
         android:layout_marginBottom="100dp"
+        android:visibility="gone"
         android:src="@drawable/ic_baseline_not_interested"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

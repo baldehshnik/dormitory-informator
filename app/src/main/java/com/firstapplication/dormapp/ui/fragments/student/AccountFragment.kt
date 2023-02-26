@@ -13,6 +13,7 @@ import androidx.core.view.children
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import com.bumptech.glide.Glide
 import com.firstapplication.dormapp.DormApp
 import com.firstapplication.dormapp.R
 import com.firstapplication.dormapp.databinding.FragmentAccountBinding
@@ -23,6 +24,7 @@ import com.firstapplication.dormapp.ui.fragments.login.MainLoginFragment
 import com.firstapplication.dormapp.ui.fragments.login.StudentLoginFragment.Companion.PASSWORD_KEY
 import com.firstapplication.dormapp.ui.fragments.login.StudentLoginFragment.Companion.ROOM_KEY
 import com.firstapplication.dormapp.ui.models.StudentModel
+import com.firstapplication.dormapp.ui.models.StudentModel.Companion.NAME_DELIMITER
 import com.firstapplication.dormapp.ui.models.StudentVerifyModel
 import com.firstapplication.dormapp.ui.viewmodels.AccountViewModel
 import com.firstapplication.dormapp.ui.viewmodels.factories.StudentViewModelFactory
@@ -122,9 +124,14 @@ class AccountFragment : BasicFragment() {
         binding.twRoomNumber.text = model.roomNumber.toString()
         binding.twHours.text = model.hours.toString()
 
-        val nameParameters = model.fullName.split(" ")
+        val nameParameters = model.fullName.split(NAME_DELIMITER)
         binding.twFirstName.text = nameParameters[0]
         binding.twLastNameAndPatronymic.text = nameParameters[1] + " " + nameParameters[2]
+
+        Glide.with(requireContext())
+            .load(model.imgSrc)
+            .placeholder(R.drawable.ic_baseline_no_image)
+            .into(binding.imgStudent)
     }
 
     private fun setLoginFragment() {

@@ -61,6 +61,8 @@
     <string name="user_added_for_registration">User added for registration</string>
     <string name="registration_info_title">Registration information</string>
 
+    <string name="news_not_found">News not found</string>
+
     <string name="registration_info">
         Your account has been added to the list of students that will be checked by the dormitory director.
     </string>
@@ -78,6 +80,23 @@
         <b>This message will not be shown again!</b>
     </string>
 
+    <string name="failed_user_data">
+        Failed to get user data. Try later!
+    </string>
+
+    <string name="student_info_format">
+        <b>Surname:</b> %s;\n
+        <b>Name:</b> %s;\n
+        <b>Patronymic:</b> %s;\n
+        <b>Pass number:</b> %s;\n
+        <b>Room:</b> %s;\n
+        <b>Worked hours:</b> %s;\n
+    </string>
+
+    <string name="invalidate">Invalidate</string>
+    <string name="validate">Validate</string>
+    <string name="close">Close</string>
+    <string name="student_info">Student information</string>
 
     <string name="pass_number">Pass number</string>
     <string name="room_number">Room number</string>
@@ -116,6 +135,8 @@
     <string name="student_icon_image">student icon image</string>
     <string name="image_button_edit">image button edit</string>
     <string name="image_open_spinner">image open spinner</string>
+    <string name="user_confirmed">User has been confirmed</string>
+    <string name="user_canceled">User has been deleted</string>
 
 
     <string-array name="time_types">
@@ -132,5 +153,9 @@
         <item>5</item>
         <item>6</item>
     </string-array>
+
+    <string name="disabled">Disabled</string>
+    <string name="website">Website</string>
+    <string name="website_long_v">Website of application</string>
 
 </resources>

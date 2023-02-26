@@ -26,8 +26,7 @@ class AdminRepositoryImpl @Inject constructor(
     private val _newsData = MutableStateFlow(listOf(NewsEntity()))
     val newsData: StateFlow<List<NewsEntity>> get() = _newsData.asStateFlow()
 
-    private val _changedNewsResult =
-        MutableStateFlow<SingleEvent<ChangeResult>>(SingleEvent(ProgressResult))
+    private val _changedNewsResult = MutableStateFlow<SingleEvent<ChangeResult>>(SingleEvent(ProgressResult))
     val changedNewsResult: StateFlow<SingleEvent<ChangeResult>> get() = _changedNewsResult.asStateFlow()
 
     private val _respondingStudents = MutableStateFlow<SelectResult>(ProgressSelect)
@@ -38,6 +37,9 @@ class AdminRepositoryImpl @Inject constructor(
 
     private val _confirmResult = MutableStateFlow<ChangeResult>(ProgressResult)
     val confirmResult: StateFlow<ChangeResult> get() = _confirmResult.asStateFlow()
+
+    private val _confirmStudentResponse = MutableStateFlow<ChangeResult>(ProgressResult)
+    val confirmStudentResponse: StateFlow<ChangeResult> get() = _confirmStudentResponse.asStateFlow()
 
     private val changedNewsListener = object : ValueEventListener {
         override fun onDataChange(snapshot: DataSnapshot) {
@@ -59,7 +61,6 @@ class AdminRepositoryImpl @Inject constructor(
 
     override suspend fun readNewsFromDB() {
         val newsReference = database.reference.child(PACKAGE_NEWS)
-
         newsReference.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(allSnapshots: DataSnapshot) {
                 val newsList = mutableListOf<NewsEntity>()
@@ -89,11 +90,11 @@ class AdminRepositoryImpl @Inject constructor(
     }
 
     override suspend fun deleteNews(id: String) {
-        val reference = database.reference.child(PACKAGE_NEWS).child(id)
-        reference.removeValue()
+        database.reference.child(PACKAGE_NEWS).child(id).removeValue()
     }
 
     override suspend fun readRespondingStudents(newsId: String) {
+        _respondingStudents.value = ProgressSelect
         val reference = database.reference.child(PACKAGE_NEWS).child(newsId).child(PACKAGE_RESPONSE)
         reference.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshots: DataSnapshot) {
@@ -150,8 +151,77 @@ class AdminRepositoryImpl @Inject constructor(
         _confirmResult.value = CorrectResult
     }
 
-    fun clearRespondingStudentsResult() {
-        _respondingStudents.value = ProgressSelect
+    override suspend fun confirmStudentResponse(newsId: String, studentEntity: StudentEntity) {
+        _confirmStudentResponse.value = ProgressResult
+        database.reference.child(PACKAGE_NEWS)
+            .child(newsId)
+            .child(PACKAGE_RESPONSE)
+            .child(studentEntity.passNumber.toString())
+            .removeValue { error, _ ->
+                if (error != null) setStudentResponseError(error.message)
+                else chargeTimeToStudent(newsId, studentEntity)
+            }
+    }
+
+    private fun chargeTimeToStudent(newsId: String, entity: StudentEntity) {
+        database.reference.child(PACKAGE_NEWS).child(newsId)
+            .addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    val time = snapshot.child(HOURS).getValue<Double>()
+                    val timeType = snapshot.child(TIME_TYPE).getValue<String>()
+                    if (time == null || timeType == null) {
+                        val errorMessage = "time or type is null"
+                        setStudentResponseError(errorMessage)
+                        Log.e(this@AdminRepositoryImpl.javaClass.simpleName, errorMessage)
+                        return
+                    }
+
+                    addTimeToStudent(time, timeType, entity)
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    setStudentResponseError(error.message)
+                }
+            })
+    }
+
+    override suspend fun cancelStudentResponse(newsId: String, pass: String) {
+        _confirmStudentResponse.value = ProgressResult
+        database.reference.child(PACKAGE_NEWS)
+            .child(newsId)
+            .child(PACKAGE_RESPONSE)
+            .child(pass)
+            .removeValue { error, _ ->
+                if (error == null) {
+                    _confirmStudentResponse.value = CorrectResult
+                } else {
+                    setStudentResponseError(error.message)
+                }
+            }
+    }
+
+    private fun setStudentResponseError(message: String) {
+        Log.e(this::class.java.simpleName, message)
+        _confirmStudentResponse.value = ErrorResult(message)
+    }
+
+    private fun addTimeToStudent(time: Double, timeType: String, student: StudentEntity) {
+        when {
+            timeType.startsWith("ч") || timeType.startsWith("h") -> {
+                student.hours += time
+            }
+            timeType.startsWith("м") || timeType.startsWith("m") -> {
+                student.hours += time / 60
+            }
+        }
+
+        database.reference.child(PACKAGE_USERS)
+            .child(student.passNumber.toString())
+            .child(HOURS)
+            .setValue(student.hours) { error, _ ->
+                if (error == null) _confirmStudentResponse.value = CorrectResult
+                else setStudentResponseError(error.message)
+            }
     }
 
     private fun readRespondingStudentsByIds(list: List<Int>) {
@@ -162,6 +232,7 @@ class AdminRepositoryImpl @Inject constructor(
         }
 
         var n = 0
+        val listSize = list.size
         var isError = false
         list.forEach {
             if (isError) return
@@ -173,7 +244,7 @@ class AdminRepositoryImpl @Inject constructor(
                     if (value != null) studentsList.add(value)
 
                     n++
-                    if (n == list.size) {
+                    if (n == listSize) {
                         _respondingStudents.value = CorrectSelect(studentsList)
                     }
                 }
@@ -189,9 +260,7 @@ class AdminRepositoryImpl @Inject constructor(
 
     private fun changeNews(news: NewsEntity) {
         val reference = database.reference.child(PACKAGE_NEWS).child(changedValueId)
-        reference.apply {
-            setValue(news)
-            addValueEventListener(changedNewsListener)
-        }
+        reference.setValue(news)
+        reference.addValueEventListener(changedNewsListener)
     }
 }
