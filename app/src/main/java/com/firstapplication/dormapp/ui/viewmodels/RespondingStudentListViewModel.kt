@@ -5,11 +5,11 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.firstapplication.dormapp.data.interfacies.AdminRepository
-import com.firstapplication.dormapp.data.models.StudentEntity
 import com.firstapplication.dormapp.data.repositories.AdminRepositoryImpl
 import com.firstapplication.dormapp.di.ActivityScope
-import com.firstapplication.dormapp.extensions.checkListTypeIsStudentEntity
 import com.firstapplication.dormapp.sealed.*
+import com.firstapplication.dormapp.ui.models.Checker
+import com.firstapplication.dormapp.ui.models.Checker.Companion.STUDENT_CHECK
 import com.firstapplication.dormapp.ui.models.StudentModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.transformWhile
@@ -25,19 +25,19 @@ class RespondingStudentListViewModel(
     private val _respondingStudentsResult = MutableLiveData<SelectResult>()
     val respondingStudentsResult: LiveData<SelectResult> get() = _respondingStudentsResult
 
-    private val _confirmStudentResponse = MutableLiveData<ChangeResult>()
-    val confirmStudentResponse: LiveData<ChangeResult> get() = _confirmStudentResponse
+    private val _confirmStudentResponse = MutableLiveData<DatabaseResult>()
+    val confirmStudentResponse: LiveData<DatabaseResult> get() = _confirmStudentResponse
 
     fun confirmStudentResponse(newsId: String, student: StudentModel) {
         viewModelScope.launch(Dispatchers.IO) {
-            repository.confirmStudentResponse(newsId, student.migrateToStudentEntity())
+            repository.confirmRespondedStudent(newsId, student.migrateToStudentEntity())
             addConfirmStudentResponseListener()
         }
     }
 
     fun cancelStudentResponse(newsId: String, passNumber: Int) {
         viewModelScope.launch(Dispatchers.IO) {
-            repository.cancelStudentResponse(newsId, passNumber.toString())
+            repository.cancelRespondedStudent(newsId, passNumber.toString())
             addConfirmStudentResponseListener()
         }
     }
@@ -45,14 +45,16 @@ class RespondingStudentListViewModel(
     private fun addConfirmStudentResponseListener() = viewModelScope.launch {
         (repository as AdminRepositoryImpl).confirmStudentResponse.transformWhile { value ->
             emit(value)
-            value == ProgressResult
+            value == Progress
         }.collect { result ->
-            _confirmStudentResponse.value = result
+            withContext(Dispatchers.Main) {
+                _confirmStudentResponse.value = result
+            }
         }
     }
 
     private fun readRespondingStudents() = viewModelScope.launch(Dispatchers.IO) {
-        repository.readRespondingStudents(newsId)
+        repository.readRespondedStudents(newsId)
         addRespondingStudentsListener()
     }
 
@@ -61,31 +63,15 @@ class RespondingStudentListViewModel(
             emit(value)
             value == ProgressSelect
         }.collect { result ->
-            if (result is CorrectSelect<*>) {
-                isStudentsList(result)
-            } else {
-                _respondingStudentsResult.value = result
+            withContext(Dispatchers.Main) {
+                val value = if (result is CorrectSelect<*>) {
+                    Checker(result.value, STUDENT_CHECK).check()
+                } else {
+                    result
+                }
+
+                _respondingStudentsResult.value = value
             }
-        }
-    }
-
-    private suspend fun migrateStudentsEntities(entities: List<StudentEntity>) = withContext(Dispatchers.Default) {
-        val models = entities.map {
-            it.migrateToStudentModel()
-        }
-        withContext(Dispatchers.Main) {
-            _respondingStudentsResult.value = CorrectSelect(models)
-        }
-    }
-
-    @Suppress("UNCHECKED_CAST")
-    private suspend fun isStudentsList(result: CorrectSelect<*>) {
-        val res = result.value
-        val isStudentEntitiesList = checkListTypeIsStudentEntity(res)
-        when {
-            res.isEmpty() -> _respondingStudentsResult.value = Empty
-            isStudentEntitiesList -> migrateStudentsEntities(res as List<StudentEntity>)
-            else -> _respondingStudentsResult.value = ErrorSelect
         }
     }
 

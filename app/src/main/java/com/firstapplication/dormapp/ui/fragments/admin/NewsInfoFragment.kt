@@ -9,11 +9,11 @@ import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import com.firstapplication.dormapp.DormApp
 import com.firstapplication.dormapp.R
 import com.firstapplication.dormapp.data.remote.ROOM_KEY
 import com.firstapplication.dormapp.databinding.FragmentNewsInfoBinding
 import com.firstapplication.dormapp.sealed.*
+import com.firstapplication.dormapp.ui.activity.LOGIN_USER_PREF
 import com.firstapplication.dormapp.ui.activity.MainActivity
 import com.firstapplication.dormapp.ui.fragments.BasicFragment
 import com.firstapplication.dormapp.ui.models.NewsModel
@@ -28,11 +28,9 @@ class NewsInfoFragment : BasicFragment() {
     private lateinit var binding: FragmentNewsInfoBinding
 
     @Inject
-    lateinit var factory: AllUsersViewModelFactory.Factory
+    lateinit var factory: AllUsersViewModelFactory
 
-    private val viewModel: NewsInfoViewModel by viewModels {
-        factory.create(activity?.application as DormApp)
-    }
+    private val viewModel: NewsInfoViewModel by viewModels { factory }
 
     @SuppressLint("SetTextI18n")
     override fun onCreateView(
@@ -43,10 +41,9 @@ class NewsInfoFragment : BasicFragment() {
         (activity as MainActivity).activityComponent?.inject(this)
         binding = FragmentNewsInfoBinding.inflate(inflater, container, false)
         switchBottomNavViewVisibility(R.id.adminBottomView, GONE)
-        switchBottomNavViewVisibility(R.id.studentBottomView, GONE)
 
         val sharedPreferences = requireActivity().getSharedPreferences(
-            MainActivity.LOGIN_USER_PREF,
+            LOGIN_USER_PREF,
             Context.MODE_PRIVATE
         )
 
@@ -111,8 +108,11 @@ class NewsInfoFragment : BasicFragment() {
     }
 
     companion object {
-        private const val NEWS_TAG = "NEWS"
-        private const val IS_ADMIN = "IS ADMIN"
+        @JvmStatic
+        private val NEWS_TAG = "NEWS"
+
+        @JvmStatic
+        private val IS_ADMIN = "IS ADMIN"
 
         @JvmStatic
         fun newInstance(news: NewsModel, isAdmin: Boolean = true): Fragment {

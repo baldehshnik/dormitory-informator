@@ -15,14 +15,8 @@ data class NewsModel(
     var isActive: Boolean
 ) : Parcelable {
 
-    fun migrateToNewsEntity() = NewsEntity(
-        id = id,
-        imgSrc = imgSrc,
-        title = title,
-        hours = hours,
-        timeType = timeType,
-        description = description,
-        isActive = isActive
-    )
+    fun migrateToNewsEntity(): NewsEntity {
+        return NewsEntity(id, imgSrc, title, hours, timeType, description, isActive)
+    }
 
 }

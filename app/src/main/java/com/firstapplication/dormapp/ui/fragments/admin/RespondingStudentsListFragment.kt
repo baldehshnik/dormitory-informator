@@ -75,13 +75,11 @@ class RespondingStudentsListFragment : BasicFragment(), OnStudentItemClickListen
         return newsId
     }
 
-    private fun handleStudentsConfirmResult(result: ChangeResult) {
+    private fun handleStudentsConfirmResult(result: DatabaseResult) {
         when (result) {
-            ProgressResult -> return
-            is ErrorResult -> {
-                toast(getStringFromRes(R.string.error))
-            }
-            CorrectResult -> {
+            Progress -> return
+            is Error -> toast(getStringFromRes(R.string.error))
+            is Correct<*> -> {
                 adapter.removeSelectedItem(selectedItem)
                 handleCurrentAction()
             }
@@ -136,7 +134,8 @@ class RespondingStudentsListFragment : BasicFragment(), OnStudentItemClickListen
     }
 
     companion object {
-        private const val NEWS_ID = "NEWS ID"
+        @JvmStatic
+        private val NEWS_ID = "NEWS ID"
 
         @JvmStatic
         private val confirmAction = 1

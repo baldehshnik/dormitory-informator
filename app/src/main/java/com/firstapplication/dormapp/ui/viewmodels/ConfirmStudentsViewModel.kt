@@ -5,10 +5,10 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.firstapplication.dormapp.data.interfacies.AdminRepository
-import com.firstapplication.dormapp.data.models.StudentEntity
 import com.firstapplication.dormapp.data.repositories.AdminRepositoryImpl
-import com.firstapplication.dormapp.extensions.checkListTypeIsStudentEntity
 import com.firstapplication.dormapp.sealed.*
+import com.firstapplication.dormapp.ui.models.Checker
+import com.firstapplication.dormapp.ui.models.Checker.Companion.STUDENT_CHECK
 import com.firstapplication.dormapp.ui.models.StudentModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.transformWhile
@@ -22,37 +22,37 @@ class ConfirmStudentsViewModel(
     private val _notSavedStudentsResult = MutableLiveData<SelectResult>()
     val notSavedStudentsResult: LiveData<SelectResult> get() = _notSavedStudentsResult
 
-    private val _confirmResult = MutableLiveData<ChangeResult>()
-    val confirmResult: LiveData<ChangeResult> get() = _confirmResult
+    private val _confirmResult = MutableLiveData<DatabaseResult>()
+    val confirmResult: LiveData<DatabaseResult> get() = _confirmResult
 
-    fun readNotConfirmedStudents() {
-        viewModelScope.launch(Dispatchers.IO) {
-            repository.readNotRegisteredStudents()
-        }
+    fun readNotConfirmedStudents() = viewModelScope.launch(Dispatchers.IO) {
+        repository.readNotRegisteredStudents()
+        addNotConfirmedStudentListener()
     }
 
-    fun confirmStudent(model: StudentModel) {
-        viewModelScope.launch(Dispatchers.IO) {
-            repository.confirmStudent(model.migrateToStudentEntity())
-            setConfirmResultListener()
-        }
+    fun confirmStudent(model: StudentModel) = viewModelScope.launch(Dispatchers.IO) {
+        repository.confirmStudentRegistration(model.migrateToStudentEntity())
+        setConfirmResultListener()
     }
 
-    fun cancelStudent(pass: String) {
-        viewModelScope.launch(Dispatchers.IO) {
-            repository.cancelStudent(pass)
-            setConfirmResultListener()
-        }
+    fun cancelStudent(pass: String) = viewModelScope.launch(Dispatchers.IO) {
+        repository.cancelStudentRegistration(pass)
+        setConfirmResultListener()
     }
 
-    private fun addNotConfirmedStudentListener() {
-        viewModelScope.launch {
-            (repository as AdminRepositoryImpl).notRegisteredStudentsResult.collect {
-                if (it is CorrectSelect<*>) {
-                    isStudentsList(it)
+    private suspend fun addNotConfirmedStudentListener() {
+        (repository as AdminRepositoryImpl).notRegisteredStudentsResult.transformWhile { value ->
+            emit(value)
+            value == ProgressSelect
+        }.collect { result ->
+            withContext(Dispatchers.Main) {
+                val value = if (result is CorrectSelect<*>) {
+                    Checker(result.value, STUDENT_CHECK).check()
                 } else {
-                    _notSavedStudentsResult.value = it
+                    result
                 }
+
+                _notSavedStudentsResult.value = value
             }
         }
     }
@@ -60,28 +60,11 @@ class ConfirmStudentsViewModel(
     private suspend fun setConfirmResultListener() {
         (repository as AdminRepositoryImpl).confirmResult.transformWhile { value ->
             emit(value)
-            value !is CorrectResult || value !is ErrorResult
+            value == Progress
         }.collect {
             withContext(Dispatchers.Main) {
                 _confirmResult.value = it
             }
         }
-    }
-
-    @Suppress("UNCHECKED_CAST")
-    private fun isStudentsList(result: CorrectSelect<*>) {
-        val res = result.value
-        val isStudentEntitiesList = checkListTypeIsStudentEntity(res)
-        _notSavedStudentsResult.value = when {
-            res.isEmpty() -> Empty
-            isStudentEntitiesList -> CorrectSelect((res as List<StudentEntity>).map {
-                it.migrateToStudentModel()
-            })
-            else -> ErrorSelect
-        }
-    }
-
-    init {
-        addNotConfirmedStudentListener()
     }
 }

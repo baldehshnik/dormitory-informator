@@ -31,15 +31,9 @@ data class SavedNewsEntity(
     var isActive: Boolean = false
 ) {
 
-    fun migrateToNewsModel() = NewsModel(
-        id = id,
-        imgSrc = imgSrc,
-        title = title,
-        hours = hours,
-        timeType = timeType,
-        description = description,
-        isActive = isActive
-    )
+    fun migrateToNewsModel() : NewsModel {
+        return NewsModel(id, imgSrc, title, timeType, hours, description, isActive)
+    }
 
     companion object {
         const val TABLE_NAME = "news"

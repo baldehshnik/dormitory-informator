@@ -10,6 +10,7 @@ abstract class NewsDatabase : RoomDatabase() {
     abstract val newsDao: SavedNewsDao
 
     companion object {
-        const val DATABASE_NAME = "news_database"
+        @JvmStatic
+        val DATABASE_NAME = "news_database"
     }
 }

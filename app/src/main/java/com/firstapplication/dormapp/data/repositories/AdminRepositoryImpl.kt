@@ -1,9 +1,10 @@
 package com.firstapplication.dormapp.data.repositories
 
 import android.util.Log
+import androidx.annotation.StringRes
+import com.firstapplication.dormapp.R
 import com.firstapplication.dormapp.data.interfacies.AdminRepository
 import com.firstapplication.dormapp.data.models.NewsEntity
-import com.firstapplication.dormapp.data.models.SingleEvent
 import com.firstapplication.dormapp.data.models.StudentEntity
 import com.firstapplication.dormapp.data.remote.*
 import com.firstapplication.dormapp.enums.ConfirmedRegistration
@@ -18,16 +19,20 @@ import javax.inject.Singleton
 
 @Singleton
 class AdminRepositoryImpl @Inject constructor(
-    private val database: FirebaseDatabase
+    database: FirebaseDatabase
 ) : AdminRepository {
+
+    private val referenceNews = database.reference.child(PACKAGE_NEWS)
+    private val referenceRegistration = database.reference.child(PACKAGE_REGISTRATION)
+    private val referenceUsers = database.reference.child(PACKAGE_USERS)
 
     private var changedValueId = ""
 
-    private val _newsData = MutableStateFlow(listOf(NewsEntity()))
-    val newsData: StateFlow<List<NewsEntity>> get() = _newsData.asStateFlow()
+    private val _newsData = MutableStateFlow<SelectResult>(ProgressSelect)
+    val newsData: StateFlow<SelectResult> get() = _newsData.asStateFlow()
 
-    private val _changedNewsResult = MutableStateFlow<SingleEvent<ChangeResult>>(SingleEvent(ProgressResult))
-    val changedNewsResult: StateFlow<SingleEvent<ChangeResult>> get() = _changedNewsResult.asStateFlow()
+    private val _changedNewsResult = MutableStateFlow<DatabaseResult>(Progress)
+    val changedNewsResult: StateFlow<DatabaseResult> get() = _changedNewsResult.asStateFlow()
 
     private val _respondingStudents = MutableStateFlow<SelectResult>(ProgressSelect)
     val respondingStudent: StateFlow<SelectResult> get() = _respondingStudents.asStateFlow()
@@ -35,21 +40,17 @@ class AdminRepositoryImpl @Inject constructor(
     private val _notRegisteredStudentsResult = MutableStateFlow<SelectResult>(ProgressSelect)
     val notRegisteredStudentsResult: StateFlow<SelectResult> get() = _notRegisteredStudentsResult.asStateFlow()
 
-    private val _confirmResult = MutableStateFlow<ChangeResult>(ProgressResult)
-    val confirmResult: StateFlow<ChangeResult> get() = _confirmResult.asStateFlow()
+    private val _confirmResult = MutableStateFlow<DatabaseResult>(Progress)
+    val confirmResult: StateFlow<DatabaseResult> get() = _confirmResult.asStateFlow()
 
-    private val _confirmStudentResponse = MutableStateFlow<ChangeResult>(ProgressResult)
-    val confirmStudentResponse: StateFlow<ChangeResult> get() = _confirmStudentResponse.asStateFlow()
+    private val _confirmStudentResponse = MutableStateFlow<DatabaseResult>(Progress)
+    val confirmStudentResponse: StateFlow<DatabaseResult> get() = _confirmStudentResponse.asStateFlow()
 
     private val changedNewsListener = object : ValueEventListener {
         override fun onDataChange(snapshot: DataSnapshot) {
             if (snapshot.exists()) {
-                _changedNewsResult.value = SingleEvent(CorrectResult)
-                database.reference
-                    .child(PACKAGE_NEWS)
-                    .child(changedValueId)
-                    .removeEventListener(this)
-
+                _changedNewsResult.value = Correct<Any?>()
+                referenceNews.child(changedValueId).removeEventListener(this)
                 changedValueId = ""
             }
         }
@@ -60,15 +61,14 @@ class AdminRepositoryImpl @Inject constructor(
     }
 
     override suspend fun readNewsFromDB() {
-        val newsReference = database.reference.child(PACKAGE_NEWS)
-        newsReference.addValueEventListener(object : ValueEventListener {
+        referenceNews.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(allSnapshots: DataSnapshot) {
                 val newsList = mutableListOf<NewsEntity>()
                 for (snapshot in allSnapshots.children) {
                     val entity = snapshot.getValue(NewsEntity::class.java)
                     if (entity != null) newsList.add(entity)
                 }
-                _newsData.value = newsList
+                _newsData.value = CorrectSelect(newsList)
             }
 
             override fun onCancelled(error: DatabaseError) {
@@ -78,8 +78,7 @@ class AdminRepositoryImpl @Inject constructor(
     }
 
     override suspend fun addNews(news: NewsEntity) {
-        val reference = database.reference.child(PACKAGE_NEWS)
-        changedValueId = reference.push().key.toString()
+        changedValueId = referenceNews.push().key.toString()
         news.id = changedValueId
         changeNews(news)
     }
@@ -90,12 +89,12 @@ class AdminRepositoryImpl @Inject constructor(
     }
 
     override suspend fun deleteNews(id: String) {
-        database.reference.child(PACKAGE_NEWS).child(id).removeValue()
+        referenceNews.child(id).removeValue()
     }
 
-    override suspend fun readRespondingStudents(newsId: String) {
+    override suspend fun readRespondedStudents(newsId: String) {
         _respondingStudents.value = ProgressSelect
-        val reference = database.reference.child(PACKAGE_NEWS).child(newsId).child(PACKAGE_RESPONSE)
+        val reference = referenceNews.child(newsId).child(PACKAGE_RESPONSE)
         reference.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshots: DataSnapshot) {
                 val respondingStudentsIdList = mutableListOf<Int>()
@@ -114,8 +113,7 @@ class AdminRepositoryImpl @Inject constructor(
     }
 
     override suspend fun readNotRegisteredStudents() {
-        val reference = database.reference.child(PACKAGE_REGISTER)
-        reference.addListenerForSingleValueEvent(object : ValueEventListener {
+        referenceRegistration.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 val students = mutableListOf<StudentEntity>()
                 for (s in snapshot.children) {
@@ -135,28 +133,21 @@ class AdminRepositoryImpl @Inject constructor(
         })
     }
 
-    override suspend fun confirmStudent(entity: StudentEntity) {
+    override suspend fun confirmStudentRegistration(entity: StudentEntity) {
         val pass = entity.passNumber.toString()
-        database.reference.child(PACKAGE_USERS).child(pass).setValue(entity)
-        _confirmResult.value = CorrectResult
-        database.reference.child(PACKAGE_REGISTER).child(pass).removeValue()
+        referenceUsers.child(pass).setValue(entity)
+        _confirmResult.value = Correct<Any?>()
+        referenceRegistration.child(pass).removeValue()
     }
 
-    override suspend fun cancelStudent(pass: String) {
-        database.reference.child(PACKAGE_REGISTER)
-            .child(pass)
-            .child(CONFIRM)
-            .setValue(ConfirmedRegistration.NOT_CONFIRMED.value)
-
-        _confirmResult.value = CorrectResult
+    override suspend fun cancelStudentRegistration(pass: String) {
+        referenceRegistration.child(pass).child(CONFIRM).setValue(ConfirmedRegistration.NOT_CONFIRMED.value)
+        _confirmResult.value = Correct<Any?>()
     }
 
-    override suspend fun confirmStudentResponse(newsId: String, studentEntity: StudentEntity) {
-        _confirmStudentResponse.value = ProgressResult
-        database.reference.child(PACKAGE_NEWS)
-            .child(newsId)
-            .child(PACKAGE_RESPONSE)
-            .child(studentEntity.passNumber.toString())
+    override suspend fun confirmRespondedStudent(newsId: String, studentEntity: StudentEntity) {
+        _confirmStudentResponse.value = Progress
+        referenceNews.child(newsId).child(PACKAGE_RESPONSE).child(studentEntity.passNumber.toString())
             .removeValue { error, _ ->
                 if (error != null) setStudentResponseError(error.message)
                 else chargeTimeToStudent(newsId, studentEntity)
@@ -164,45 +155,38 @@ class AdminRepositoryImpl @Inject constructor(
     }
 
     private fun chargeTimeToStudent(newsId: String, entity: StudentEntity) {
-        database.reference.child(PACKAGE_NEWS).child(newsId)
-            .addListenerForSingleValueEvent(object : ValueEventListener {
-                override fun onDataChange(snapshot: DataSnapshot) {
-                    val time = snapshot.child(HOURS).getValue<Double>()
-                    val timeType = snapshot.child(TIME_TYPE).getValue<String>()
-                    if (time == null || timeType == null) {
-                        val errorMessage = "time or type is null"
-                        setStudentResponseError(errorMessage)
-                        Log.e(this@AdminRepositoryImpl.javaClass.simpleName, errorMessage)
-                        return
-                    }
-
-                    addTimeToStudent(time, timeType, entity)
+        referenceNews.child(newsId).addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val time = snapshot.child(HOURS).getValue<Double>()
+                val timeType = snapshot.child(TIME_TYPE).getValue<String>()
+                if (time == null || timeType == null) {
+                    val errorMessage = "time or type is null"
+                    setStudentResponseError(errorMessage)
+                    Log.e(this@AdminRepositoryImpl.javaClass.simpleName, errorMessage)
+                    return
                 }
 
-                override fun onCancelled(error: DatabaseError) {
-                    setStudentResponseError(error.message)
-                }
-            })
+                addTimeToStudent(time, timeType, entity)
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                setStudentResponseError(error.message)
+            }
+        })
     }
 
-    override suspend fun cancelStudentResponse(newsId: String, pass: String) {
-        _confirmStudentResponse.value = ProgressResult
-        database.reference.child(PACKAGE_NEWS)
-            .child(newsId)
-            .child(PACKAGE_RESPONSE)
-            .child(pass)
+    override suspend fun cancelRespondedStudent(newsId: String, pass: String) {
+        _confirmStudentResponse.value = Progress
+        referenceNews.child(newsId).child(PACKAGE_RESPONSE).child(pass)
             .removeValue { error, _ ->
-                if (error == null) {
-                    _confirmStudentResponse.value = CorrectResult
-                } else {
-                    setStudentResponseError(error.message)
-                }
+                if (error == null) _confirmStudentResponse.value = Correct<Any?>()
+                else setStudentResponseError(error.message)
             }
     }
 
-    private fun setStudentResponseError(message: String) {
-        Log.e(this::class.java.simpleName, message)
-        _confirmStudentResponse.value = ErrorResult(message)
+    private fun setStudentResponseError(logMessage: String, @StringRes showMessageRes: Int = R.string.error) {
+        Log.e(this::class.java.simpleName, logMessage)
+        _confirmStudentResponse.value = Error(showMessageRes)
     }
 
     private fun addTimeToStudent(time: Double, timeType: String, student: StudentEntity) {
@@ -215,11 +199,9 @@ class AdminRepositoryImpl @Inject constructor(
             }
         }
 
-        database.reference.child(PACKAGE_USERS)
-            .child(student.passNumber.toString())
-            .child(HOURS)
+        referenceUsers.child(student.passNumber.toString()).child(HOURS)
             .setValue(student.hours) { error, _ ->
-                if (error == null) _confirmStudentResponse.value = CorrectResult
+                if (error == null) _confirmStudentResponse.value = Correct<Any?>()
                 else setStudentResponseError(error.message)
             }
     }
@@ -237,8 +219,7 @@ class AdminRepositoryImpl @Inject constructor(
         list.forEach {
             if (isError) return
 
-            val reference = database.reference.child(PACKAGE_USERS).child(it.toString())
-            reference.addListenerForSingleValueEvent(object : ValueEventListener {
+            referenceUsers.child(it.toString()).addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
                     val value = snapshot.getValue(StudentEntity::class.java)
                     if (value != null) studentsList.add(value)
@@ -259,7 +240,7 @@ class AdminRepositoryImpl @Inject constructor(
     }
 
     private fun changeNews(news: NewsEntity) {
-        val reference = database.reference.child(PACKAGE_NEWS).child(changedValueId)
+        val reference = referenceNews.child(changedValueId)
         reference.setValue(news)
         reference.addValueEventListener(changedNewsListener)
     }

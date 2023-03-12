@@ -7,7 +7,7 @@ import kotlinx.parcelize.Parcelize
 @Parcelize
 data class StudentModel(
     val fullName: String,
-    var imgSrc: String = "android.resource//drawable/ic_baseline_no_image",
+    var imgSrc: String,
     val passNumber: Int,
     val roomNumber: Int,
     val hours: Double,

@@ -1,9 +1,8 @@
 package com.firstapplication.dormapp.ui.viewmodels
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.firstapplication.dormapp.data.interfacies.StudentRepository
 import com.firstapplication.dormapp.data.models.StudentVerifyEntity
@@ -18,18 +17,15 @@ import kotlinx.coroutines.withContext
 
 @ActivityScope
 class StudentLoginViewModel(
-    application: Application,
     private val repository: StudentRepository
-) : AndroidViewModel(application) {
+) : ViewModel() {
 
     private val _verifiedUser = MutableLiveData<LoginStudentResult>()
     val verifiedUser: LiveData<LoginStudentResult> get() = _verifiedUser
 
     fun checkUser(passNumber: Int, roomNumber: Int, password: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            repository.checkStudentInDatabase(StudentVerifyEntity(
-                passNumber = passNumber, roomNumber = roomNumber, password = password
-            ))
+            repository.checkStudentInDatabase(StudentVerifyEntity(passNumber, roomNumber, password))
             addVerifiedResult()
         }
     }

@@ -9,6 +9,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import com.firstapplication.dormapp.R
 import com.firstapplication.dormapp.databinding.FragmentNewsListAdminBinding
+import com.firstapplication.dormapp.sealed.*
 import com.firstapplication.dormapp.ui.activity.MainActivity
 import com.firstapplication.dormapp.ui.adapters.NewsAdminAdapter
 import com.firstapplication.dormapp.ui.fragments.BasicFragment
@@ -21,6 +22,8 @@ import javax.inject.Inject
 class NewsListAdminFragment : BasicFragment(), OnAdminNewsItemClickListener {
 
     private lateinit var binding: FragmentNewsListAdminBinding
+
+    private lateinit var adapter: NewsAdminAdapter
 
     @Inject
     lateinit var factory: AdminVMFactory
@@ -38,13 +41,11 @@ class NewsListAdminFragment : BasicFragment(), OnAdminNewsItemClickListener {
         binding = FragmentNewsListAdminBinding.inflate(inflater, container, false)
         switchBottomNavViewVisibility(R.id.adminBottomView, VISIBLE)
 
-        val adapter = NewsAdminAdapter(this)
+        adapter = NewsAdminAdapter(this)
         binding.rwNewsAdmin.adapter = adapter
 
-        viewModel.news.observe(viewLifecycleOwner) { models ->
-            adapter.submitList(models)
-            binding.progressBarNewsAdmin.isVisible = false
-            binding.rwNewsAdmin.isVisible = true
+        viewModel.news.observe(viewLifecycleOwner) { event ->
+            handleNewsEvent(event)
         }
 
         return binding.root
@@ -53,18 +54,30 @@ class NewsListAdminFragment : BasicFragment(), OnAdminNewsItemClickListener {
     override fun onFullItemClick(news: NewsModel) {
         parentFragmentManager.beginTransaction()
             .addToBackStack(null)
-            .replace(R.id.fragmentContainer, NewsInfoFragment.newInstance(news = news))
+            .replace(R.id.fragmentContainer, NewsInfoFragment.newInstance(news))
             .commit()
     }
 
     override fun onEditClick(news: NewsModel) {
         parentFragmentManager.beginTransaction()
             .addToBackStack(null)
-            .replace(
-                R.id.fragmentContainer,
-                AddWorkFragment.newInstance(news = news)
-            )
+            .replace(R.id.fragmentContainer, AddWorkFragment.newInstance(news))
             .commit()
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    private fun handleNewsEvent(event: SelectResult) = when (event) {
+        is ProgressSelect -> {
+            binding.progressBarNewsAdmin.isVisible = false
+            binding.rwNewsAdmin.isVisible = true
+        }
+        is ErrorSelect -> toast(getStringFromRes(R.string.error))
+        is Empty -> toast(getStringFromRes(R.string.empty))
+        is CorrectSelect<*> -> {
+            adapter.submitList(event.value as MutableList<NewsModel>)
+            binding.progressBarNewsAdmin.isVisible = false
+            binding.rwNewsAdmin.isVisible = true
+        }
     }
 
     companion object {

@@ -1,27 +1,16 @@
 package com.firstapplication.dormapp.ui.viewmodels.factories
 
-import android.app.Application
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.firstapplication.dormapp.data.interfacies.AdminRepository
 import com.firstapplication.dormapp.data.interfacies.StudentRepository
-import com.firstapplication.dormapp.di.ActivityScope
 import com.firstapplication.dormapp.ui.viewmodels.NewsInfoViewModel
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedFactory
-import dagger.assisted.AssistedInject
+import javax.inject.Inject
 
-class AllUsersViewModelFactory @AssistedInject constructor(
-    @Assisted("application") private val application: Application,
+class AllUsersViewModelFactory @Inject constructor(
     private val adminRepository: AdminRepository,
     private val studentRepository: StudentRepository
-) : ViewModelProvider.AndroidViewModelFactory(application) {
-
-    @AssistedFactory
-    @ActivityScope
-    interface Factory {
-        fun create(@Assisted("application") application: Application): AllUsersViewModelFactory
-    }
+) : ViewModelProvider.Factory {
 
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         return when {
@@ -32,7 +21,7 @@ class AllUsersViewModelFactory @AssistedInject constructor(
 
     @Suppress("UNCHECKED_CAST")
     fun <T: ViewModel> createNewsInfoViewModelAsT(): T {
-        return NewsInfoViewModel(application, adminRepository, studentRepository) as T
+        return NewsInfoViewModel(adminRepository, studentRepository) as T
     }
 
 }

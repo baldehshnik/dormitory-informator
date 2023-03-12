@@ -1,11 +1,11 @@
 package com.firstapplication.dormapp.ui.fragments.admin
 
 import android.content.ContentResolver
+import android.content.Context
 import android.net.Uri
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -20,10 +20,11 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import com.firstapplication.dormapp.R
 import com.firstapplication.dormapp.databinding.FragmentAddWorkBinding
-import com.firstapplication.dormapp.sealed.ChangeResult
-import com.firstapplication.dormapp.sealed.CorrectResult
-import com.firstapplication.dormapp.sealed.ErrorResult
-import com.firstapplication.dormapp.sealed.ProgressResult
+import com.firstapplication.dormapp.sealed.DatabaseResult
+import com.firstapplication.dormapp.sealed.Correct
+import com.firstapplication.dormapp.sealed.Error
+import com.firstapplication.dormapp.sealed.Progress
+import com.firstapplication.dormapp.ui.activity.LOGIN_USER_PREF
 import com.firstapplication.dormapp.ui.activity.MainActivity
 import com.firstapplication.dormapp.ui.fragments.BasicFragment
 import com.firstapplication.dormapp.ui.models.NewsModel
@@ -65,7 +66,7 @@ class AddWorkFragment : BasicFragment() {
         }
 
         viewModel.changedResult.observe(viewLifecycleOwner) { event ->
-            checkChangedNewsResult(event.getValue())
+            checkChangedNewsResult(event)
         }
 
         initSpinner(R.array.time_types, binding.timeTypeSpinner)
@@ -93,6 +94,14 @@ class AddWorkFragment : BasicFragment() {
             }
         })
 
+        binding.myBTN.setOnClickListener {
+            val sharedPreferences = context?.getSharedPreferences(
+                LOGIN_USER_PREF,
+                Context.MODE_PRIVATE
+            )
+            sharedPreferences?.edit()?.clear()?.apply()
+        }
+
         return binding.root
     }
 
@@ -106,27 +115,23 @@ class AddWorkFragment : BasicFragment() {
         }
     }
 
-    private fun checkChangedNewsResult(result: ChangeResult?) {
+    private fun checkChangedNewsResult(result: DatabaseResult?) {
         when {
-            result is ErrorResult -> {
-                Log.e(this::class.java.simpleName, result.message)
-                toast(getStringFromRes(R.string.error))
+            result is Error -> {
+                toast(getStringFromRes(result.message))
                 enableButtons()
             }
-            result is ProgressResult -> {
+            result is Progress -> {
                 enableButtons(false)
             }
-            result is CorrectResult && isEdit -> {
+            result is Correct<*> && isEdit -> {
                 toast(getStringFromRes(R.string.edited))
                 parentFragmentManager.popBackStack()
                 enableButtons()
             }
-            result is CorrectResult -> {
+            result is Correct<*> -> {
                 toast(getStringFromRes(R.string.record_added))
                 enableButtons()
-            }
-            else -> {
-                return
             }
         }
     }
@@ -194,8 +199,7 @@ class AddWorkFragment : BasicFragment() {
                 }
 
                 if (binding.etTime.text.toString() != binding.hoursSpinner.selectedItem.toString()) {
-                    binding.etTime.text = Editable.Factory.getInstance()
-                        .newEditable(adapter?.selectedItem.toString())
+                    binding.etTime.text = Editable.Factory.getInstance().newEditable(adapter?.selectedItem.toString())
                 }
             }
 
@@ -211,7 +215,7 @@ class AddWorkFragment : BasicFragment() {
         viewModel.createNews(
             id = newsModel?.id ?: "",
             title = binding.etTitle.text.toString(),
-            img = getUriFromDrawable(drawableRes),
+            imgUri = getUriFromDrawable(drawableRes),
             time = binding.etTime.text.toString(),
             timeType = binding.etTimeType.text.toString(),
             description = binding.etDescription.text.toString(),
@@ -230,10 +234,10 @@ class AddWorkFragment : BasicFragment() {
         binding.timeTypeSpinner.setSelection(0)
     }
 
-    private fun getDrawableByCheckedRadioButton() = if (binding.rbWork.isChecked)
-        R.drawable.ic_baseline_work_active
-    else
-        R.drawable.ic_baseline_newspaper
+    private fun getDrawableByCheckedRadioButton(): Int {
+        return if (binding.rbWork.isChecked) R.drawable.ic_baseline_work_active
+        else R.drawable.ic_baseline_newspaper
+    }
 
     private fun getUriFromDrawable(@DrawableRes drawableId: Int): Uri {
         return Uri.parse(
@@ -255,7 +259,8 @@ class AddWorkFragment : BasicFragment() {
     }
 
     companion object {
-        private const val NEWS_TAG = "NEWS"
+        @JvmStatic
+        private val NEWS_TAG = "NEWS"
 
         @JvmStatic
         fun newInstance(news: NewsModel? = null): AddWorkFragment {

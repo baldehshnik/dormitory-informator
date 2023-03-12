@@ -1,18 +1,18 @@
 package com.firstapplication.dormapp.ui.viewmodels
 
-import android.app.Application
 import androidx.annotation.StringRes
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.firstapplication.dormapp.Encryptor
 import com.firstapplication.dormapp.R
 import com.firstapplication.dormapp.data.interfacies.StudentRepository
 import com.firstapplication.dormapp.data.repositories.StudentRepositoryImpl
 import com.firstapplication.dormapp.di.ActivityScope
-import com.firstapplication.dormapp.sealed.ChangeResponse
-import com.firstapplication.dormapp.sealed.Correct
+import com.firstapplication.dormapp.sealed.DatabaseResult
+import com.firstapplication.dormapp.sealed.Error
+import com.firstapplication.dormapp.sealed.Progress
 import com.firstapplication.dormapp.ui.models.StudentModel
 import com.firstapplication.dormapp.ui.models.StudentModel.Companion.NAME_DELIMITER
 import kotlinx.coroutines.Dispatchers
@@ -22,12 +22,11 @@ import kotlinx.coroutines.withContext
 
 @ActivityScope
 class StudentRegisterViewModel(
-    application: Application,
     private val repository: StudentRepository
-) : AndroidViewModel(application) {
+) : ViewModel() {
 
-    private val _registerResponse = MutableLiveData<ChangeResponse>()
-    val registerResponse: LiveData<ChangeResponse> get() = _registerResponse
+    private val _registerResponse = MutableLiveData<DatabaseResult>()
+    val registerResponse: LiveData<DatabaseResult> get() = _registerResponse
 
     fun registerStudent(
         surname: String,
@@ -36,35 +35,35 @@ class StudentRegisterViewModel(
         passNumber: String,
         roomNumber: String,
         password: String
-    ) {
-        viewModelScope.launch {
-            val data = listOf(surname, name, patronymic, passNumber, roomNumber, password)
-            data.forEach {
-                if (it.isEmpty()) {
-                    setErrorResponse(R.string.fields_must_be_filled)
-                    return@launch
-                }
-            }
-
-            if (checkRegistrationData(passNumber, roomNumber, password)) {
-                val encryptedPassword: String? = Encryptor().toEncrypt(password)
-                if (encryptedPassword.isNullOrEmpty()) {
-                    setErrorResponse(R.string.password_encrypt_error)
-                    return@launch
-                }
-
-                registerStudentInDatabase(
-                    studentModel = StudentModel(
-                        fullName = "$surname$NAME_DELIMITER$name$NAME_DELIMITER$patronymic",
-                        password = encryptedPassword,
-                        passNumber = passNumber.toInt(),
-                        roomNumber = roomNumber.toInt(),
-                        hours = 0.0
-                    )
-                )
+    ) = viewModelScope.launch(Dispatchers.Default) {
+        val data = listOf(surname, name, patronymic, passNumber, roomNumber, password)
+        data.forEach {
+            if (it.isEmpty()) {
+                setErrorResponse(R.string.fields_must_be_filled)
+                return@launch
             }
         }
+
+        if (checkRegistrationData(passNumber, roomNumber, password)) {
+            val encryptedPassword: String? = Encryptor().encrypt(password)
+            if (encryptedPassword.isNullOrEmpty()) {
+                setErrorResponse(R.string.password_encrypt_error)
+                return@launch
+            }
+
+            registerStudentInDatabase(
+                StudentModel(
+                    fullName = "$surname$NAME_DELIMITER$name$NAME_DELIMITER$patronymic",
+                    imgSrc = "android.resource//drawable/ic_baseline_no_image",
+                    password = encryptedPassword,
+                    passNumber = passNumber.toInt(),
+                    roomNumber = roomNumber.toInt(),
+                    hours = 0.0
+                )
+            )
+        }
     }
+
 
     private fun registerStudentInDatabase(studentModel: StudentModel) {
         viewModelScope.launch(Dispatchers.IO) {
@@ -75,14 +74,14 @@ class StudentRegisterViewModel(
 
     private suspend fun setErrorResponse(@StringRes message: Int) {
         withContext(Dispatchers.Main) {
-            _registerResponse.value = com.firstapplication.dormapp.sealed.Error(message)
+            _registerResponse.value = Error(message)
         }
     }
 
     private suspend fun setRegisteredStudentResponseListener() {
         (repository as StudentRepositoryImpl).registerResponse.transformWhile { value ->
             emit(value)
-            value !is Correct && value !is Error
+            value == Progress
         }.collect {
             withContext(Dispatchers.Main) {
                 _registerResponse.value = it

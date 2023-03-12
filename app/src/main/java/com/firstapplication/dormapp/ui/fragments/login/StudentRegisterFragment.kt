@@ -8,15 +8,15 @@ import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
-import com.firstapplication.dormapp.DormApp
 import com.firstapplication.dormapp.R
 import com.firstapplication.dormapp.databinding.FragmentRegisterStudentBinding
-import com.firstapplication.dormapp.sealed.*
+import com.firstapplication.dormapp.sealed.Correct
+import com.firstapplication.dormapp.sealed.Error
+import com.firstapplication.dormapp.sealed.Progress
 import com.firstapplication.dormapp.ui.activity.MainActivity
 import com.firstapplication.dormapp.ui.fragments.BasicFragment
 import com.firstapplication.dormapp.ui.viewmodels.StudentRegisterViewModel
 import com.firstapplication.dormapp.ui.viewmodels.factories.StudentViewModelFactory
-import com.google.android.material.snackbar.Snackbar
 import javax.inject.Inject
 
 class StudentRegisterFragment : BasicFragment() {
@@ -24,11 +24,9 @@ class StudentRegisterFragment : BasicFragment() {
     private lateinit var binding: FragmentRegisterStudentBinding
 
     @Inject
-    lateinit var factory: StudentViewModelFactory.Factory
+    lateinit var factory: StudentViewModelFactory
 
-    private val viewModel: StudentRegisterViewModel by viewModels {
-        factory.create(activity?.application as DormApp)
-    }
+    private val viewModel: StudentRegisterViewModel by viewModels { factory }
 
     @SuppressLint("UnspecifiedImmutableFlag")
     override fun onCreateView(
@@ -40,17 +38,15 @@ class StudentRegisterFragment : BasicFragment() {
         binding = FragmentRegisterStudentBinding.inflate(inflater, container, false)
 
         binding.btnRegister.setOnClickListener { onRegisterClick() }
-        binding.btnCancel.setOnClickListener {
-            onCancelClick()
-        }
+        binding.btnCancel.setOnClickListener { onCancelClick() }
 
         viewModel.registerResponse.observe(viewLifecycleOwner) { response ->
             when (response) {
                 is Error -> {
                     changeLayoutVisibility(visibility = false)
-                    Snackbar.make(binding.etSurname, response.message, Snackbar.LENGTH_LONG).show()
+                    snackBar(binding.etSurname, getStringFromRes(response.message))
                 }
-                is Correct -> {
+                is Correct<*> -> {
                     changeLayoutVisibility(visibility = false)
                     showRegistrationInfoAlertDialog()
                 }

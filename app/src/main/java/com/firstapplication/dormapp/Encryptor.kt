@@ -7,12 +7,13 @@ import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
 
 class Encryptor {
-    fun toEncrypt(toEncrypt: String): String? {
+
+    fun encrypt(toEncrypt: String): String? {
         val messageDigest: MessageDigest
         val digest: ByteArray
 
         try {
-            messageDigest = MessageDigest.getInstance(ALGORITHM)
+            messageDigest = MessageDigest.getInstance(algorithm)
             messageDigest.reset()
             messageDigest.update(toEncrypt.toByteArray())
 
@@ -32,6 +33,7 @@ class Encryptor {
     }
 
     companion object {
-        private const val ALGORITHM = "MD5"
+        @JvmStatic
+        private val algorithm = "MD5"
     }
 }

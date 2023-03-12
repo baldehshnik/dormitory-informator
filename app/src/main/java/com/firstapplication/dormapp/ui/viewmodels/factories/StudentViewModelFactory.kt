@@ -1,27 +1,17 @@
 package com.firstapplication.dormapp.ui.viewmodels.factories
 
-import android.app.Application
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.firstapplication.dormapp.data.repositories.StudentRepositoryImpl
-import com.firstapplication.dormapp.ui.viewmodels.StudentLoginViewModel
 import com.firstapplication.dormapp.ui.viewmodels.AccountViewModel
 import com.firstapplication.dormapp.ui.viewmodels.NewsListViewModel
+import com.firstapplication.dormapp.ui.viewmodels.StudentLoginViewModel
 import com.firstapplication.dormapp.ui.viewmodels.StudentRegisterViewModel
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedFactory
-import dagger.assisted.AssistedInject
-import java.lang.IllegalArgumentException
+import javax.inject.Inject
 
-class StudentViewModelFactory @AssistedInject constructor(
-    @Assisted("application") private val application: Application,
+class StudentViewModelFactory @Inject constructor(
     private val repository: StudentRepositoryImpl
-) : ViewModelProvider.AndroidViewModelFactory(application = application) {
-
-    @AssistedFactory
-    interface Factory {
-        fun create(@Assisted("application") application: Application): StudentViewModelFactory
-    }
+) : ViewModelProvider.Factory {
 
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         return when {
@@ -35,21 +25,21 @@ class StudentViewModelFactory @AssistedInject constructor(
 
     @Suppress("UNCHECKED_CAST")
     private fun <T: ViewModel> initStudentRegisterViewModelAsT(): T {
-        return StudentRegisterViewModel(application = application, repository = repository) as T
+        return StudentRegisterViewModel(repository = repository) as T
     }
 
     @Suppress("UNCHECKED_CAST")
     private fun <T: ViewModel> initNewsListViewModel(): T {
-        return NewsListViewModel(application = application, repository = repository) as T
+        return NewsListViewModel(repository = repository) as T
     }
 
     @Suppress("UNCHECKED_CAST")
     private fun <T: ViewModel> initStudentLoginViewModel(): T {
-        return StudentLoginViewModel(application = application, repository = repository) as T
+        return StudentLoginViewModel(repository = repository) as T
     }
 
     @Suppress("UNCHECKED_CAST")
     private fun <T: ViewModel> initStudentViewModel(): T {
-        return AccountViewModel(application = application, repository = repository) as T
+        return AccountViewModel(repository = repository) as T
     }
 }

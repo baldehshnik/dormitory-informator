@@ -3,7 +3,6 @@ package com.firstapplication.dormapp.ui.adapters
 import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import android.widget.ImageButton
 import androidx.core.net.toUri
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -17,8 +16,10 @@ class NewsAdminAdapter(
     private val listener: OnAdminNewsItemClickListener
 ) : ListAdapter<NewsModel, NewsAdminAdapter.NewsAdminViewHolder>(NewsDiffUtil()) {
 
-    class NewsAdminViewHolder(private val binding: NewsAdminItemBinding) :
-        RecyclerView.ViewHolder(binding.root) {
+    class NewsAdminViewHolder(
+        private val binding: NewsAdminItemBinding,
+        private val listener: OnAdminNewsItemClickListener
+    ) : RecyclerView.ViewHolder(binding.root) {
 
         @SuppressLint("SetTextI18n")
         fun bind(newsModel: NewsModel) = with(binding) {
@@ -29,24 +30,23 @@ class NewsAdminAdapter(
                 .load(newsModel.imgSrc.toUri())
                 .placeholder(R.drawable.ic_baseline_broken_image)
                 .into(binding.imgNewsIcon)
+
+            root.setOnClickListener {
+                listener.onFullItemClick(newsModel)
+            }
+
+            btnEdit.setOnClickListener {
+                listener.onEditClick(newsModel)
+            }
         }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NewsAdminViewHolder {
         val inflater = LayoutInflater.from(parent.context)
-        return NewsAdminViewHolder(NewsAdminItemBinding.inflate(inflater, parent, false))
+        return NewsAdminViewHolder(NewsAdminItemBinding.inflate(inflater, parent, false), listener)
     }
 
     override fun onBindViewHolder(holder: NewsAdminViewHolder, position: Int) {
-        val item = getItem(position)
-
-        holder.bind(item)
-        holder.itemView.setOnClickListener {
-            listener.onFullItemClick(item)
-        }
-
-        holder.itemView.findViewById<ImageButton>(R.id.btnEdit).setOnClickListener {
-            listener.onEditClick(item)
-        }
+        holder.bind(getItem(position))
     }
 }

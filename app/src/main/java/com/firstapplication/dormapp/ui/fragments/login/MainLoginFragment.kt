@@ -9,6 +9,10 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.setFragmentResultListener
 import com.firstapplication.dormapp.R
 import com.firstapplication.dormapp.databinding.FragmentMainLoginBinding
+import com.firstapplication.dormapp.sealed.Administrator
+import com.firstapplication.dormapp.sealed.Student
+import com.firstapplication.dormapp.sealed.UserType
+import com.firstapplication.dormapp.ui.activity.MainActivity
 import com.firstapplication.dormapp.ui.fragments.admin.ConfirmStudentsFragment
 import com.firstapplication.dormapp.ui.fragments.login.StudentLoginFragment.Companion.PASS_KEY
 import com.firstapplication.dormapp.ui.fragments.student.AccountFragment
@@ -20,12 +24,12 @@ class MainLoginFragment : Fragment(R.layout.fragment_main_login) {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setFragmentResultListener(ADMIN_LOGIN_KEY) { _, bundle ->
-            changeDefaultFragmentToAdmin(key = bundle.getBoolean(ADMIN_INIT, false))
+            changeDefaultFragmentToAdmin(bundle.getBoolean(ADMIN_INIT, false))
         }
         setFragmentResultListener(STUDENT_LOGIN_KEY) { _, bundle ->
             changeDefaultFragmentToStudent(
-                key = bundle.getBoolean(STUDENT_INIT, false),
-                userKey = bundle.getInt(PASS_KEY, -1)
+                bundle.getBoolean(STUDENT_INIT, false),
+                bundle.getInt(PASS_KEY, -1)
             )
         }
     }
@@ -54,17 +58,30 @@ class MainLoginFragment : Fragment(R.layout.fragment_main_login) {
     }
 
     private fun changeDefaultFragmentToAdmin(key: Boolean) {
-        if (key) parentFragmentManager.beginTransaction()
-            .add(R.id.fragmentContainer, ConfirmStudentsFragment.newInstance())
-            .remove(this@MainLoginFragment)
-            .commit()
+        if (key) {
+            parentFragmentManager.beginTransaction()
+                .add(R.id.fragmentContainer, ConfirmStudentsFragment.newInstance())
+                .remove(this@MainLoginFragment)
+                .commit()
+
+            setNewCurrentUserType(Administrator)
+        }
     }
 
     private fun changeDefaultFragmentToStudent(key: Boolean, userKey: Int) {
-        if (key) parentFragmentManager.beginTransaction()
-            .add(R.id.fragmentContainer, AccountFragment.newInstance(userKey))
-            .remove(this@MainLoginFragment)
-            .commit()
+        if (key) {
+            parentFragmentManager.beginTransaction()
+                .add(R.id.fragmentContainer, AccountFragment.newInstance(userKey))
+                .remove(this@MainLoginFragment)
+                .commit()
+
+            setNewCurrentUserType(Student)
+        }
+    }
+
+    private fun setNewCurrentUserType(userType: UserType) {
+        val activity = activity
+        if (activity is MainActivity) activity.setNewCurrentUserType(this, userType)
     }
 
     private fun openAdminLoginFragment() {
@@ -92,6 +109,7 @@ class MainLoginFragment : Fragment(R.layout.fragment_main_login) {
         const val ADMIN_INIT = "ADMIN_INIT"
         const val STUDENT_INIT = "STUDENT_INIT"
 
+        @JvmStatic
         fun newInstance(): MainLoginFragment {
             return MainLoginFragment()
         }

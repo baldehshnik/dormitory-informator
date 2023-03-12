@@ -2,7 +2,6 @@ package com.firstapplication.dormapp.ui.adapters
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.firstapplication.dormapp.R
@@ -29,5 +28,4 @@ class NewsAdapter : ListAdapter<NewsModel, NewsAdapter.NewsViewHolder>(NewsDiffU
     override fun onBindViewHolder(holder: NewsViewHolder, position: Int) {
         holder.bind(getItem(position))
     }
-
 }

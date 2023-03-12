@@ -46,6 +46,10 @@
     <string name="student_not_confirmed">The student has not been confirmed</string>
     <string name="attention">Attention</string>
 
+    <string name="empty">Empty</string>
+    <string name="not_registered">Not registered</string>
+    <string name="undefined_type">Undefined type</string>
+
     <string name="to_confirm_reg_dialog">
         Are you sure you want to confirm registration of %s?
     </string>

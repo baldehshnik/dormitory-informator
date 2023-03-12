@@ -12,14 +12,8 @@ data class NewsEntity(
     var isActive: Boolean = false
 ) {
 
-    fun migrateToNewsModel() = NewsModel(
-        id = id,
-        imgSrc = imgSrc,
-        title = title,
-        hours = hours,
-        timeType = timeType,
-        description = description,
-        isActive = isActive
-    )
+    fun migrateToNewsModel() : NewsModel {
+        return NewsModel(id, imgSrc, title, timeType, hours, description, isActive)
+    }
 
 }

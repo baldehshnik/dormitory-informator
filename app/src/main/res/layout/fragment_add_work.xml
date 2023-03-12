@@ -134,6 +134,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="10dp"
+                android:lines="6"
                 android:hint="@string/description" />
 
         </com.google.android.material.textfield.TextInputLayout>
@@ -183,6 +184,14 @@
             app:layout_constraintEnd_toEndOf="@id/tilTime"
             app:layout_constraintTop_toTopOf="@id/tilTime"
             tools:ignore="SpeakableTextPresentCheck" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/myBTN"
+            android:text="OUT"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

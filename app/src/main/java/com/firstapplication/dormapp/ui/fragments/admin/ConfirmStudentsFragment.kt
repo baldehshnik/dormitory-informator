@@ -19,7 +19,6 @@ import com.firstapplication.dormapp.ui.models.StudentModel
 import com.firstapplication.dormapp.ui.models.StudentModel.Companion.NAME_DELIMITER
 import com.firstapplication.dormapp.ui.viewmodels.ConfirmStudentsViewModel
 import com.firstapplication.dormapp.ui.viewmodels.factories.AdminVMFactory
-import com.google.android.material.snackbar.Snackbar
 import javax.inject.Inject
 
 class ConfirmStudentsFragment : BasicFragment(), OnNotConfirmedStudentItemClickListener {
@@ -44,7 +43,6 @@ class ConfirmStudentsFragment : BasicFragment(), OnNotConfirmedStudentItemClickL
         binding = FragmentConfirmStudentsBinding.inflate(inflater, container, false)
 
         switchBottomNavViewVisibility(R.id.adminBottomView, VISIBLE)
-        switchBottomNavViewVisibility(R.id.studentBottomView, INVISIBLE)
 
         viewModel.readNotConfirmedStudents()
 
@@ -63,20 +61,14 @@ class ConfirmStudentsFragment : BasicFragment(), OnNotConfirmedStudentItemClickL
     private fun handleReadStudentsResult(result: SelectResult) {
         when (result) {
             is ErrorSelect -> {
-                Snackbar.make(
-                    binding.rwNotConfirmedStudents,
-                    getStringFromRes(R.string.error),
-                    Snackbar.LENGTH_SHORT
-                ).show()
+                snackBar(binding.rwNotConfirmedStudents, getStringFromRes(R.string.error))
                 changeLayoutVisibility(isProgress = false)
             }
             is ProgressSelect -> {
                 changeLayoutVisibility(isProgress = true)
             }
             is CorrectSelect<*> -> {
-                adapter = NotConfirmedStudentsAdapter(
-                    this, result.value as MutableList<StudentModel>
-                )
+                adapter = NotConfirmedStudentsAdapter(this, result.value as MutableList<StudentModel>)
                 binding.rwNotConfirmedStudents.adapter = adapter
                 changeLayoutVisibility(isProgress = false)
             }
@@ -90,9 +82,9 @@ class ConfirmStudentsFragment : BasicFragment(), OnNotConfirmedStudentItemClickL
         }
     }
 
-    private fun handleConfirmResult(result: ChangeResult) {
+    private fun handleConfirmResult(result: DatabaseResult) {
         when (result) {
-            is CorrectResult -> {
+            is Correct<*> -> {
                 adapter.removeSelectedItem(selectedItem)
                 changeLayoutVisibility(isProgress = false)
                 binding.rwNotConfirmedStudents.isClickable = true
@@ -103,12 +95,12 @@ class ConfirmStudentsFragment : BasicFragment(), OnNotConfirmedStudentItemClickL
                     toast(getStringFromRes(R.string.student_not_confirmed))
                 }
             }
-            is ErrorResult -> {
+            is Error -> {
                 changeLayoutVisibility(isProgress = false)
                 binding.rwNotConfirmedStudents.isClickable = true
                 toast(getStringFromRes(R.string.database_error))
             }
-            is ProgressResult -> {
+            is Progress -> {
                 binding.rwNotConfirmedStudents.isClickable = false
             }
         }

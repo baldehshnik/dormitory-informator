@@ -9,12 +9,12 @@ import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.core.os.bundleOf
 import androidx.fragment.app.viewModels
-import com.firstapplication.dormapp.DormApp
 import com.firstapplication.dormapp.Encryptor
 import com.firstapplication.dormapp.R
 import com.firstapplication.dormapp.databinding.FragmentStudentLoginBinding
 import com.firstapplication.dormapp.extensions.saveStudent
 import com.firstapplication.dormapp.sealed.*
+import com.firstapplication.dormapp.ui.activity.LOGIN_USER_PREF
 import com.firstapplication.dormapp.ui.activity.MainActivity
 import com.firstapplication.dormapp.ui.fragments.BasicFragment
 import com.firstapplication.dormapp.ui.fragments.login.MainLoginFragment.Companion.STUDENT_INIT
@@ -28,11 +28,9 @@ class StudentLoginFragment : BasicFragment() {
     private lateinit var binding: FragmentStudentLoginBinding
 
     @Inject
-    lateinit var viewModelFactory: StudentViewModelFactory.Factory
+    lateinit var viewModelFactory: StudentViewModelFactory
 
-    private val viewModel: StudentLoginViewModel by viewModels {
-        viewModelFactory.create(activity?.application as DormApp)
-    }
+    private val viewModel: StudentLoginViewModel by viewModels { viewModelFactory }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -46,7 +44,7 @@ class StudentLoginFragment : BasicFragment() {
                 val passStr = binding.etPassNumber.text?.toString() ?: ""
                 val roomStr = binding.etRoomNumber.text?.toString() ?: ""
                 val password = binding.etPassword.text?.toString() ?: ""
-                clickConfirm(passStr = passStr, roomStr = roomStr, password = password)
+                clickConfirm(passStr, roomStr, password)
                 switchEditTexts(false)
             }
             btnCancel.setOnClickListener {
@@ -80,15 +78,18 @@ class StudentLoginFragment : BasicFragment() {
             }
             CorrectLoginResult -> {
                 val sharedPreferences = requireActivity().getSharedPreferences(
-                    MainActivity.LOGIN_USER_PREF,
+                    LOGIN_USER_PREF,
                     Context.MODE_PRIVATE
                 )
 
                 val passStr = binding.etPassNumber.text.toString()
                 val roomStr = binding.etRoomNumber.text.toString()
-                val password = Encryptor().toEncrypt(
-                    binding.etPassword.text.toString()
-                ) ?: getStringFromRes(R.string.not_encrypted)
+                val password = Encryptor().encrypt(binding.etPassword.text.toString())
+
+                if (password == null) {
+                    toast(getStringFromRes(R.string.not_encrypted))
+                    return
+                }
 
                 sharedPreferences.saveStudent(passStr, roomStr, password)
 
@@ -124,7 +125,7 @@ class StudentLoginFragment : BasicFragment() {
         try {
             val passNumber = passStr.toInt()
             val roomNumber = roomStr.toInt()
-            viewModel.checkUser(passNumber, roomNumber, Encryptor().toEncrypt(password) ?: "")
+            viewModel.checkUser(passNumber, roomNumber, Encryptor().encrypt(password) ?: "")
         } catch (e: Exception) {
             toast(getStringFromRes(R.string.date_not_correct))
         }
@@ -135,6 +136,7 @@ class StudentLoginFragment : BasicFragment() {
         const val PASSWORD_KEY = "PASSWORD_KEY"
         const val PASS_KEY = "PASS_KEY"
 
+        @JvmStatic
         fun newInstance(): StudentLoginFragment {
             return StudentLoginFragment()
         }
