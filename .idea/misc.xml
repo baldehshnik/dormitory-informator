@@ -10,6 +10,7 @@
         <entry key="..\:/DormApp/app/src/main/res/drawable/ic_baseline_account.xml" value="0.2703125" />
         <entry key="..\:/DormApp/app/src/main/res/drawable/ic_baseline_add.xml" value="0.2703125" />
         <entry key="..\:/DormApp/app/src/main/res/drawable/ic_baseline_app_registration.xml" value="0.2703125" />
+        <entry key="..\:/DormApp/app/src/main/res/drawable/ic_baseline_arrow_left.xml" value="0.2703125" />
         <entry key="..\:/DormApp/app/src/main/res/drawable/ic_baseline_card.xml" value="0.2703125" />
         <entry key="..\:/DormApp/app/src/main/res/drawable/ic_baseline_close.xml" value="0.2703125" />
         <entry key="..\:/DormApp/app/src/main/res/drawable/ic_baseline_home.xml" value="0.2703125" />
@@ -32,6 +33,8 @@
         <entry key="..\:/DormApp/app/src/main/res/layout/student_alert_dialog_view.xml" value="0.25416666666666665" />
         <entry key="..\:/DormApp/app/src/main/res/menu/admin_nav_menu.xml" value="0.25416666666666665" />
         <entry key="..\:/DormApp/app/src/main/res/menu/student_nav_menu.xml" value="0.25416666666666665" />
+        <entry key="..\:/DormApp/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml" value="0.2564814814814815" />
+        <entry key="..\:/DormApp/app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml" value="0.2564814814814815" />
       </map>
     </option>
   </component>

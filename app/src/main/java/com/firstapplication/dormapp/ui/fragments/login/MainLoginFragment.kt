@@ -4,20 +4,22 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isVisible
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.setFragmentResultListener
+import com.bumptech.glide.Glide
 import com.firstapplication.dormapp.R
 import com.firstapplication.dormapp.databinding.FragmentMainLoginBinding
 import com.firstapplication.dormapp.sealed.Administrator
 import com.firstapplication.dormapp.sealed.Student
 import com.firstapplication.dormapp.sealed.UserType
 import com.firstapplication.dormapp.ui.activity.MainActivity
+import com.firstapplication.dormapp.ui.fragments.BasicFragment
 import com.firstapplication.dormapp.ui.fragments.admin.ConfirmStudentsFragment
 import com.firstapplication.dormapp.ui.fragments.login.StudentLoginFragment.Companion.PASS_KEY
 import com.firstapplication.dormapp.ui.fragments.student.AccountFragment
 
-class MainLoginFragment : Fragment(R.layout.fragment_main_login) {
+class MainLoginFragment : BasicFragment() {
 
     private lateinit var binding: FragmentMainLoginBinding
 
@@ -38,23 +40,28 @@ class MainLoginFragment : Fragment(R.layout.fragment_main_login) {
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
         binding = FragmentMainLoginBinding.inflate(layoutInflater, container, false)
+        switchToolBarVisibility(GONE)
 
-        binding.btnCancel.setOnClickListener { changeStudentLayout(false) }
-        binding.btnStudent.setOnClickListener { changeStudentLayout(true) }
+        Glide.with(requireContext())
+            .load(ResourcesCompat.getDrawable(resources, R.drawable.hello_icon, null))
+            .into(binding.helloImage)
 
+        binding.btnStudent.setOnClickListener { openStudentLoginFragment() }
         binding.btnAdmin.setOnClickListener { openAdminLoginFragment() }
-        binding.btnLogin.setOnClickListener { openStudentLoginFragment() }
         binding.btnRegister.setOnClickListener { openStudentRegisterFragment() }
+
+        binding.btnLogin.setOnClickListener { changeVisibility(false) }
+        binding.btnBack.setOnClickListener { changeVisibility(true) }
 
         return binding.root
     }
 
-    private fun changeStudentLayout(visibility: Boolean) = with(binding) {
-        btnAdmin.isVisible = !visibility
-        btnStudent.isVisible = !visibility
+    private fun changeVisibility(visibility: Boolean) = with(binding) {
         btnLogin.isVisible = visibility
         btnRegister.isVisible = visibility
-        btnCancel.isVisible = visibility
+        btnStudent.isVisible = !visibility
+        btnAdmin.isVisible = !visibility
+        btnBack.isVisible = !visibility
     }
 
     private fun changeDefaultFragmentToAdmin(key: Boolean) {

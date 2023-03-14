@@ -8,6 +8,7 @@
 
     <string name="first_info_text">Some first info text</string>
     <string name="admin">Admin</string>
+    <string name="administrator">Administrator</string>
     <string name="student">Student</string>
     <string name="bottom_text">Some bottom text</string>
     <string name="surname">Surname</string>
@@ -124,6 +125,7 @@
     <string name="added">Added</string>
     <string name="pay">Pay</string>
     <string name="students">Students</string>
+    <string name="register_account">Register new account</string>
 
 
     // Student menu
@@ -141,6 +143,7 @@
     <string name="image_open_spinner">image open spinner</string>
     <string name="user_confirmed">User has been confirmed</string>
     <string name="user_canceled">User has been deleted</string>
+    <string name="hello_image">hello image description</string>
 
 
     <string-array name="time_types">
