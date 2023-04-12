@@ -3,84 +3,143 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="match_parent">
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/constLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cardCancel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="15dp"
+            android:layout_marginTop="15dp"
+            android:visibility="gone"
+            app:cardBackgroundColor="@color/white"
+            app:cardCornerRadius="20dp"
+            app:cardElevation="6dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageButton
+                android:id="@+id/btnCancel"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:backgroundTint="@android:color/transparent"
+                android:src="@drawable/ic_baseline_arrow_left" />
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <ImageView
+            android:id="@+id/imgIcon"
+            android:layout_width="172dp"
+            android:layout_height="172dp"
+            android:layout_marginTop="70dp"
+            android:elevation="10dp"
+            android:background="@drawable/background_round_image"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/imgBackground"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:background="@drawable/background_light_blue_gradient"
+            android:scaleType="centerCrop"
+            android:elevation="2dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/tilTitle"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
+            android:layout_marginHorizontal="10dp"
+            android:layout_marginTop="16dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            app:layout_constraintTop_toBottomOf="@id/imgIcon">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="10dp"
+                android:layout_marginHorizontal="6dp"
                 android:hint="@string/title" />
 
         </com.google.android.material.textfield.TextInputLayout>
 
-        <RadioGroup
-            android:id="@+id/radioGroup"
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cardWork"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="10dp"
-            android:layout_marginVertical="10dp"
-            android:orientation="horizontal"
-            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_height="160dp"
+            android:layout_marginHorizontal="20dp"
+            android:layout_marginTop="10dp"
+            app:cardCornerRadius="36dp"
+            app:cardElevation="2dp"
+            app:layout_constraintBottom_toTopOf="@id/tilTime"
+            app:layout_constraintEnd_toStartOf="@id/cardNews"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tilTitle">
+            app:layout_constraintTop_toBottomOf="@id/tilTitle"
+            app:layout_constraintVertical_bias="0.1"
+            app:strokeColor="@color/blue_500"
+            app:strokeWidth="2dp">
 
-            <RadioButton
-                android:id="@+id/rbWork"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:checked="true"
-                android:paddingStart="6dp"
-                android:text="@string/work"
-                android:textColor="@color/black"
-                android:textSize="16sp"
-                tools:ignore="RtlSymmetry" />
+            <ImageView
+                android:id="@+id/imgWork"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginHorizontal="10dp"
+                android:layout_marginVertical="10dp" />
 
-            <RadioButton
-                android:id="@+id/rbNews"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:paddingStart="6dp"
-                android:text="@string/news"
-                android:textColor="@color/black"
-                android:textSize="16sp"
-                tools:ignore="RtlSymmetry" />
+        </com.google.android.material.card.MaterialCardView>
 
-        </RadioGroup>
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cardNews"
+            android:layout_width="0dp"
+            android:layout_height="160dp"
+            android:layout_marginHorizontal="20dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+            app:cardCornerRadius="36dp"
+            app:cardElevation="2dp"
+            app:layout_constraintBottom_toTopOf="@id/tilTime"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/cardWork"
+            app:layout_constraintTop_toBottomOf="@id/tilTitle"
+            app:layout_constraintVertical_bias="0.1"
+            app:strokeWidth="2dp">
+
+            <ImageView
+                android:id="@+id/imgNews"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginHorizontal="10dp"
+                android:layout_marginVertical="10dp" />
+
+        </com.google.android.material.card.MaterialCardView>
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/tilTime"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginHorizontal="10dp"
             android:layout_marginTop="10dp"
             app:layout_constraintEnd_toStartOf="@id/tilTimeType"
             app:layout_constraintHorizontal_weight="7"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/radioGroup">
+            app:layout_constraintTop_toBottomOf="@id/cardWork">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etTime"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="10dp"
+                android:layout_marginHorizontal="6dp"
                 android:hint="@string/time"
                 android:inputType="numberDecimal" />
 
@@ -91,17 +150,18 @@
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginHorizontal="10dp"
             android:layout_marginTop="10dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_weight="5"
             app:layout_constraintStart_toEndOf="@id/tilTime"
-            app:layout_constraintTop_toBottomOf="@id/radioGroup">
+            app:layout_constraintTop_toBottomOf="@id/cardWork">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etTimeType"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="10dp"
+                android:layout_marginHorizontal="6dp"
                 android:inputType="numberDecimal"
                 tools:ignore="SpeakableTextPresentCheck,SpeakableTextPresentCheck" />
 
@@ -111,8 +171,8 @@
             android:id="@+id/timeTypeSpinner"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:layout_marginStart="15dp"
-            android:layout_marginEnd="10dp"
+            android:layout_marginHorizontal="10dp"
+            android:layout_marginTop="4dp"
             app:layout_constraintBottom_toBottomOf="@id/tilTimeType"
             app:layout_constraintEnd_toEndOf="@id/tilTimeType"
             app:layout_constraintStart_toStartOf="@id/tilTimeType"
@@ -124,6 +184,7 @@
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginHorizontal="10dp"
             android:layout_marginTop="10dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -133,9 +194,10 @@
                 android:id="@+id/etDescription"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="10dp"
-                android:lines="6"
-                android:hint="@string/description" />
+                android:layout_marginHorizontal="6dp"
+                android:hint="@string/description"
+                android:inputType="textMultiLine"
+                android:minLines="2" />
 
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -143,36 +205,16 @@
             android:id="@+id/btnSave"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="10dp"
-            android:layout_marginTop="10dp"
+            android:layout_marginHorizontal="80dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="40dp"
             android:text="@string/save"
+            android:textAllCaps="false"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tilDescription" />
-
-        <Button
-            android:id="@+id/btnCancel"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="10dp"
-            android:layout_marginTop="2dp"
-            android:text="@string/cancel"
-            android:visibility="gone"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/btnSave" />
-
-        <Button
-            android:id="@+id/btnDelete"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="10dp"
-            android:layout_marginTop="2dp"
-            android:text="@string/delete"
-            android:visibility="gone"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/btnCancel" />
+            app:layout_constraintTop_toBottomOf="@id/tilDescription"
+            app:layout_constraintVertical_bias="0.2" />
 
         <Spinner
             android:id="@+id/hoursSpinner"
@@ -186,12 +228,12 @@
             tools:ignore="SpeakableTextPresentCheck" />
 
         <Button
+            android:id="@+id/myBTN"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/myBTN"
             android:text="OUT"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"/>
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

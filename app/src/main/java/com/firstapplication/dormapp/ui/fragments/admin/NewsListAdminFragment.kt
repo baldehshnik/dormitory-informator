@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AlertDialog
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import com.firstapplication.dormapp.R
@@ -22,7 +23,6 @@ import javax.inject.Inject
 class NewsListAdminFragment : BasicFragment(), OnAdminNewsItemClickListener {
 
     private lateinit var binding: FragmentNewsListAdminBinding
-
     private lateinit var adapter: NewsAdminAdapter
 
     @Inject
@@ -37,12 +37,11 @@ class NewsListAdminFragment : BasicFragment(), OnAdminNewsItemClickListener {
         savedInstanceState: Bundle?
     ): View {
         (activity as MainActivity).activityComponent.also { it?.inject(this) }
-
         binding = FragmentNewsListAdminBinding.inflate(inflater, container, false)
-        switchBottomNavViewVisibility(R.id.adminBottomView, VISIBLE)
 
-        adapter = NewsAdminAdapter(this)
-        binding.rwNewsAdmin.adapter = adapter
+        switchBottomNavViewVisibility(R.id.adminBottomView, VISIBLE)
+        switchBottomNavViewVisibility(R.id.studentBottomView, VISIBLE)
+        switchToolBarVisibility(VISIBLE)
 
         viewModel.news.observe(viewLifecycleOwner) { event ->
             handleNewsEvent(event)
@@ -65,16 +64,31 @@ class NewsListAdminFragment : BasicFragment(), OnAdminNewsItemClickListener {
             .commit()
     }
 
+    override fun onLongClick(selectedItemPosition: Int): Boolean {
+        AlertDialog.Builder(requireContext())
+            .setTitle(getStringFromRes(R.string.want_remove))
+            .setIcon(R.drawable.ic_baseline_info)
+            .setPositiveButton(R.string.confirm) { _, _ ->
+                adapter.removeSelectedItem(selectedItemPosition)
+            }
+            .setNegativeButton(R.string.cancel, null)
+            .create()
+            .show()
+
+        return true
+    }
+
     @Suppress("UNCHECKED_CAST")
     private fun handleNewsEvent(event: SelectResult) = when (event) {
         is ProgressSelect -> {
-            binding.progressBarNewsAdmin.isVisible = false
-            binding.rwNewsAdmin.isVisible = true
+            binding.progressBarNewsAdmin.isVisible = true
+            binding.rwNewsAdmin.isVisible = false
         }
         is ErrorSelect -> toast(getStringFromRes(R.string.error))
         is Empty -> toast(getStringFromRes(R.string.empty))
         is CorrectSelect<*> -> {
-            adapter.submitList(event.value as MutableList<NewsModel>)
+            adapter = NewsAdminAdapter(event.value as MutableList<NewsModel>, this)
+            binding.rwNewsAdmin.adapter = adapter
             binding.progressBarNewsAdmin.isVisible = false
             binding.rwNewsAdmin.isVisible = true
         }

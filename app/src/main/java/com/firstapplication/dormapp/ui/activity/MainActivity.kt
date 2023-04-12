@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager.POP_BACK_STACK_INCLUSIVE
 import com.firstapplication.dormapp.R
 import com.firstapplication.dormapp.databinding.ActivityLoginBinding
 import com.firstapplication.dormapp.di.ActivitySubComponent
@@ -16,8 +17,10 @@ import com.firstapplication.dormapp.ui.fragments.admin.AddWorkFragment
 import com.firstapplication.dormapp.ui.fragments.admin.ConfirmStudentsFragment
 import com.firstapplication.dormapp.ui.fragments.admin.NewsListAdminFragment
 import com.firstapplication.dormapp.ui.fragments.login.MainLoginFragment
+import com.firstapplication.dormapp.ui.fragments.login.MainLoginFragment.Companion.MAIN_LOGIN_FRAGMENT_TAG
 import com.firstapplication.dormapp.ui.fragments.student.AccountFragment
 import com.firstapplication.dormapp.ui.fragments.student.NewsListFragment
+import com.firstapplication.dormapp.utils.UserTypeGsonConverter
 
 const val LOGIN_USER_PREF = "LOGIN_USER"
 const val LOGIN_KEY = "LOGIN_KEY"
@@ -25,6 +28,7 @@ const val LOGIN_KEY = "LOGIN_KEY"
 class MainActivity : AppCompatActivity() {
 
     private var currentUserType: UserType = NoOne
+    private var isBackPressed = false
 
     private lateinit var binding: ActivityLoginBinding
 
@@ -37,6 +41,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         activityComponent = appComponent.activityComponentBuilder().build()
+        supportActionBar?.setDisplayShowTitleEnabled(true)
 
         if (savedInstanceState == null) {
             val sharedPreferences = getSharedPreferences(LOGIN_USER_PREF, MODE_PRIVATE)
@@ -44,12 +49,17 @@ class MainActivity : AppCompatActivity() {
 
             if (loginKey == null) openLoginFragment()
             else openUserFragment(loginKey)
+        } else {
+            currentUserType = UserTypeGsonConverter().fromGson(savedInstanceState.getString(USER_TYPE).toString())
         }
 
         binding.studentBottomView.setOnItemSelectedListener {
             when (it.itemId) {
                 R.id.itemAccount -> navigateStudent(ACCOUNT_FRAGMENT_TAG, null)
-                R.id.itemNewsList -> navigateStudent(NEWS_FRAGMENT_TAG, NewsListFragment.newInstance())
+                R.id.itemNewsList -> navigateStudent(
+                    NEWS_FRAGMENT_TAG,
+                    NewsListFragment.newInstance()
+                )
             }
 
             return@setOnItemSelectedListener true
@@ -57,9 +67,9 @@ class MainActivity : AppCompatActivity() {
 
         binding.adminBottomView.setOnItemSelectedListener {
             when (it.itemId) {
-                R.id.itemConfirmStudents -> navigateAdmin(CONFIRM_STUDENTS_TAG, null)
-                R.id.itemAdd -> navigateAdmin(ADD_NEWS_TAG, AddWorkFragment.newInstance())
-                R.id.itemNewsListAdmin -> navigateAdmin(
+                R.id.itemConfirmStudents -> navigateAdministrator(CONFIRM_STUDENTS_TAG, ConfirmStudentsFragment.newInstance())
+                R.id.itemAdd -> navigateAdministrator(ADD_NEWS_TAG, AddWorkFragment.newInstance())
+                R.id.itemNewsListAdmin -> navigateAdministrator(
                     NEWS_ADMIN_FRAGMENT_TAG,
                     NewsListAdminFragment.newInstance()
                 )
@@ -67,6 +77,11 @@ class MainActivity : AppCompatActivity() {
 
             return@setOnItemSelectedListener true
         }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        outState.putString(USER_TYPE, UserTypeGsonConverter().toGson(currentUserType))
+        super.onSaveInstanceState(outState)
     }
 
     private fun studentBackPressed() {
@@ -87,16 +102,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun adminBackPressed() {
-        val isNewsAdminVisible = findFragmentByTag(NEWS_ADMIN_FRAGMENT_TAG)?.isVisible
-        val isAddNewsVisible = findFragmentByTag(ADD_NEWS_TAG)?.isVisible
-
-        if (
-            supportFragmentManager.backStackEntryCount == 2 &&
-            (isNewsAdminVisible == true || isAddNewsVisible == true)
-        ) {
-            supportFragmentManager.popBackStack()
-        } else {
+        if (supportFragmentManager.backStackEntryCount > 1) {
             super.onBackPressed()
+            isBackPressed = true
             when {
                 findFragmentByTag(NEWS_ADMIN_FRAGMENT_TAG)?.isVisible == true -> {
                     binding.adminBottomView.selectedItemId = R.id.itemNewsListAdmin
@@ -108,10 +116,13 @@ class MainActivity : AppCompatActivity() {
                     binding.adminBottomView.selectedItemId = R.id.itemConfirmStudents
                 }
             }
+        } else {
+            finish()
+            return
         }
     }
 
-    override fun onBackPressed() = when(currentUserType) {
+    override fun onBackPressed() = when (currentUserType) {
         NoOne -> super.onBackPressed()
         Student -> studentBackPressed()
         Administrator -> adminBackPressed()
@@ -122,25 +133,7 @@ class MainActivity : AppCompatActivity() {
         activityComponent = null
     }
 
-    private fun findFragmentByTag(tag: String): Fragment? {
-        return supportFragmentManager.findFragmentByTag(tag)
-    }
-
-    private fun navigateAdmin(tag: String, newFragment: Fragment?) {
-        val fragment = findFragmentByTag(tag)
-        if (fragment != null && tag != CONFIRM_STUDENTS_TAG) {
-            supportFragmentManager.beginTransaction()
-                .addToBackStack(null)
-                .replace(R.id.fragmentContainer, fragment, tag)
-                .commit()
-        } else if (fragment != null && tag == CONFIRM_STUDENTS_TAG) {
-            repeat(supportFragmentManager.backStackEntryCount) {
-                supportFragmentManager.popBackStack()
-            }
-        } else {
-            addFragmentToBackStack(newFragment, tag)
-        }
-    }
+    private fun findFragmentByTag(tag: String) = supportFragmentManager.findFragmentByTag(tag)
 
     private fun navigateStudent(tag: String, newFragment: Fragment?) {
         val fragment = findFragmentByTag(tag)
@@ -153,9 +146,23 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun navigateAdministrator(tag: String, newFragment: Fragment?) {
+        if (isBackPressed) {
+            isBackPressed = false
+            return
+        }
+
+        val fragment = findFragmentByTag(tag)
+
+        if (fragment != null && fragment.isVisible) return
+        else if (fragment != null) supportFragmentManager.popBackStack(tag, POP_BACK_STACK_INCLUSIVE)
+
+        addFragmentToBackStack(newFragment, tag)
+    }
+
     private fun addFragmentToBackStack(fragment: Fragment?, tag: String) {
         supportFragmentManager.beginTransaction()
-            .addToBackStack(null)
+            .addToBackStack(tag)
             .replace(R.id.fragmentContainer, fragment ?: return, tag)
             .commit()
     }
@@ -178,27 +185,19 @@ class MainActivity : AppCompatActivity() {
 
     private fun openAdminFragment() {
         supportFragmentManager.beginTransaction()
-            .add(
-                R.id.fragmentContainer,
-                ConfirmStudentsFragment.newInstance(),
-                CONFIRM_STUDENTS_TAG
-            )
+            .add(R.id.fragmentContainer, ConfirmStudentsFragment.newInstance(), CONFIRM_STUDENTS_TAG)
             .commit()
     }
 
     private fun openStudentFragment(key: Int) {
         supportFragmentManager.beginTransaction()
-            .add(
-                R.id.fragmentContainer,
-                AccountFragment.newInstance(key = key),
-                ACCOUNT_FRAGMENT_TAG
-            )
+            .add(R.id.fragmentContainer, AccountFragment.newInstance(key), ACCOUNT_FRAGMENT_TAG)
             .commit()
     }
 
     private fun openLoginFragment() {
         supportFragmentManager.beginTransaction()
-            .add(R.id.fragmentContainer, MainLoginFragment.newInstance())
+            .add(R.id.fragmentContainer, MainLoginFragment.newInstance(), MAIN_LOGIN_FRAGMENT_TAG)
             .commit()
     }
 
@@ -207,6 +206,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     companion object {
+        @JvmStatic
+        private val USER_TYPE = "USER TYPE"
+
         @JvmStatic
         val NEWS_FRAGMENT_TAG = "NEWS_LIST_TAG"
 

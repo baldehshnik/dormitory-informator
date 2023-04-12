@@ -5,10 +5,13 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ScrollView
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
+import androidx.core.content.res.ResourcesCompat
 import androidx.core.os.bundleOf
 import androidx.fragment.app.viewModels
+import com.bumptech.glide.Glide
 import com.firstapplication.dormapp.Encryptor
 import com.firstapplication.dormapp.R
 import com.firstapplication.dormapp.databinding.FragmentStudentLoginBinding
@@ -39,15 +42,22 @@ class StudentLoginFragment : BasicFragment() {
         binding = FragmentStudentLoginBinding.inflate(inflater, container, false)
         (activity as MainActivity).activityComponent.also { it?.inject(this) }
 
+        val scrollView = ScrollView(requireContext())
+        scrollView.addView(binding.root)
+
+        Glide.with(requireContext())
+            .load(ResourcesCompat.getDrawable(resources, R.drawable.dormitory_text, null))
+            .into(binding.dormitoryTextImage)
+
         with(binding) {
             btnConfirm.setOnClickListener {
-                val passStr = binding.etPassNumber.text?.toString() ?: ""
-                val roomStr = binding.etRoomNumber.text?.toString() ?: ""
-                val password = binding.etPassword.text?.toString() ?: ""
+                val passStr = etPassNumber.text?.toString() ?: ""
+                val roomStr = etRoomNumber.text?.toString() ?: ""
+                val password = etPassword.text?.toString() ?: ""
                 clickConfirm(passStr, roomStr, password)
                 switchEditTexts(false)
             }
-            btnCancel.setOnClickListener {
+            btnBack.setOnClickListener {
                 parentFragmentManager.popBackStack()
             }
         }
@@ -56,7 +66,7 @@ class StudentLoginFragment : BasicFragment() {
             checkVerifiedUser(it)
         }
 
-        return binding.root
+        return scrollView
     }
 
     private fun switchEditTexts(value: Boolean) = with(binding) {

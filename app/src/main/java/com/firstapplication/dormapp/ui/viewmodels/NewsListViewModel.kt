@@ -10,8 +10,8 @@ import com.firstapplication.dormapp.di.ActivityScope
 import com.firstapplication.dormapp.sealed.CorrectSelect
 import com.firstapplication.dormapp.sealed.ProgressSelect
 import com.firstapplication.dormapp.sealed.SelectResult
-import com.firstapplication.dormapp.ui.models.Checker
-import com.firstapplication.dormapp.ui.models.Checker.Companion.NEWS_CHECK
+import com.firstapplication.dormapp.utils.Checker
+import com.firstapplication.dormapp.utils.Checker.Companion.NEWS_CHECK
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.transformWhile
 import kotlinx.coroutines.launch

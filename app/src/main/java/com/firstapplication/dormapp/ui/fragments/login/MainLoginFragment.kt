@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ScrollView
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.setFragmentResultListener
@@ -14,6 +15,7 @@ import com.firstapplication.dormapp.sealed.Administrator
 import com.firstapplication.dormapp.sealed.Student
 import com.firstapplication.dormapp.sealed.UserType
 import com.firstapplication.dormapp.ui.activity.MainActivity
+import com.firstapplication.dormapp.ui.activity.MainActivity.Companion.CONFIRM_STUDENTS_TAG
 import com.firstapplication.dormapp.ui.fragments.BasicFragment
 import com.firstapplication.dormapp.ui.fragments.admin.ConfirmStudentsFragment
 import com.firstapplication.dormapp.ui.fragments.login.StudentLoginFragment.Companion.PASS_KEY
@@ -40,7 +42,6 @@ class MainLoginFragment : BasicFragment() {
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
         binding = FragmentMainLoginBinding.inflate(layoutInflater, container, false)
-        switchToolBarVisibility(GONE)
 
         Glide.with(requireContext())
             .load(ResourcesCompat.getDrawable(resources, R.drawable.hello_icon, null))
@@ -53,22 +54,26 @@ class MainLoginFragment : BasicFragment() {
         binding.btnLogin.setOnClickListener { changeVisibility(false) }
         binding.btnBack.setOnClickListener { changeVisibility(true) }
 
-        return binding.root
+        return ScrollView(requireContext()).also { it.addView(binding.root) }
     }
 
-    private fun changeVisibility(visibility: Boolean) = with(binding) {
-        btnLogin.isVisible = visibility
-        btnRegister.isVisible = visibility
-        btnStudent.isVisible = !visibility
-        btnAdmin.isVisible = !visibility
-        btnBack.isVisible = !visibility
+    private fun changeVisibility(startScreenVisibility: Boolean) = with(binding) {
+        btnLogin.isVisible = startScreenVisibility
+        btnRegister.isVisible = startScreenVisibility
+        btnStudent.isVisible = !startScreenVisibility
+        btnAdmin.isVisible = !startScreenVisibility
+        btnBack.isVisible = !startScreenVisibility
     }
 
     private fun changeDefaultFragmentToAdmin(key: Boolean) {
         if (key) {
             parentFragmentManager.beginTransaction()
-                .add(R.id.fragmentContainer, ConfirmStudentsFragment.newInstance())
-                .remove(this@MainLoginFragment)
+                .remove(parentFragmentManager.findFragmentByTag(MAIN_LOGIN_FRAGMENT_TAG) ?: return)
+                .commit()
+            
+            parentFragmentManager.beginTransaction()
+                .addToBackStack(CONFIRM_STUDENTS_TAG)
+                .add(R.id.fragmentContainer, ConfirmStudentsFragment.newInstance(), CONFIRM_STUDENTS_TAG)
                 .commit()
 
             setNewCurrentUserType(Administrator)
@@ -115,6 +120,8 @@ class MainLoginFragment : BasicFragment() {
         const val STUDENT_LOGIN_KEY = "STUDENT_FRAGMENT_LISTENER"
         const val ADMIN_INIT = "ADMIN_INIT"
         const val STUDENT_INIT = "STUDENT_INIT"
+
+        const val MAIN_LOGIN_FRAGMENT_TAG = "MAIN_LOGIN_FRAGMENT_TAG"
 
         @JvmStatic
         fun newInstance(): MainLoginFragment {

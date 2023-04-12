@@ -6,48 +6,55 @@
     android:layout_height="match_parent"
     tools:context=".ui.fragments.login.StudentLoginFragment">
 
-    <TextView
-        android:id="@+id/twStudentInfo"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="200dp"
-        android:fontFamily="sans-serif-medium"
-        android:text="@string/first_info_text"
-        android:textColor="@color/black"
-        android:textSize="18sp"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
+    <ImageView
+        android:id="@+id/dormitoryTextImage"
+        android:layout_width="0dp"
+        android:layout_height="160dp"
+        android:layout_marginTop="50dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageButton
+        android:id="@+id/btnBack"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="10dp"
+        android:backgroundTint="@android:color/transparent"
+        android:src="@drawable/ic_baseline_arrow_left"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/etPassNumberLayout"
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="10dp"
-        android:layout_marginTop="5dp"
+        android:layout_marginHorizontal="36dp"
+        android:layout_marginTop="40dp"
+        app:boxBackgroundColor="@android:color/transparent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/twStudentInfo"
+        app:layout_constraintTop_toBottomOf="@id/dormitoryTextImage"
         app:passwordToggleContentDescription="surname">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/etPassNumber"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:hint="@string/pass_number"
             android:inputType="number"
-            android:text=""
-            android:hint="@string/pass_number" />
+            android:text="" />
 
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/etRoomNumberLayout"
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="10dp"
-        android:layout_marginTop="5dp"
+        android:layout_marginHorizontal="36dp"
+        android:layout_marginTop="10dp"
+        app:boxBackgroundColor="@android:color/transparent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@id/etPassNumberLayout"
@@ -57,62 +64,73 @@
             android:id="@+id/etRoomNumber"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:hint="@string/room_number"
             android:inputType="number"
-            android:text=""
-            android:hint="@string/room_number" />
+            android:text="" />
 
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/etPasswordLayout"
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="10dp"
-        android:layout_marginTop="5dp"
+        android:layout_marginHorizontal="36dp"
+        android:layout_marginTop="10dp"
+        app:boxBackgroundColor="@android:color/transparent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@id/etRoomNumberLayout"
-        app:passwordToggleContentDescription="surname"
+        app:passwordToggleContentDescription="@string/password"
         app:passwordToggleEnabled="true">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/etPassword"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text=""
+            android:hint="@string/password"
             android:inputType="textPassword"
-            android:hint="@string/password" />
+            android:text="" />
 
     </com.google.android.material.textfield.TextInputLayout>
 
     <Button
-        android:id="@+id/btnCancel"
-        android:layout_width="wrap_content"
+        android:id="@+id/btnConfirm"
+        android:layout_width="200dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:layout_marginEnd="20dp"
-        android:text="@string/cancel"
-        app:layout_constraintEnd_toStartOf="@id/btnConfirm"
+        android:layout_marginTop="30dp"
+        android:backgroundTint="@color/light_blue"
+        android:text="@string/confirm"
+        android:textAllCaps="false"
+        android:textSize="18sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/etPasswordLayout" />
 
     <Button
-        android:id="@+id/btnConfirm"
+        android:id="@+id/btnRegister"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:layout_marginEnd="20dp"
-        android:text="@string/confirm"
+        android:layout_marginTop="6dp"
+        android:background="@android:color/transparent"
+        android:text="@string/register_account"
+        android:textAllCaps="false"
+        android:textColor="@color/light_blue"
+        android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/etPasswordLayout" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/btnConfirm" />
 
-    <TextView
-        android:layout_width="match_parent"
+    <Button
+        android:id="@+id/btnForgotPassword"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:gravity="center"
-        android:text="@string/bottom_text"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:background="@android:color/transparent"
+        android:text="@string/forgot_password"
+        android:textAllCaps="false"
+        android:textColor="@color/grey"
+        android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/btnRegister" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

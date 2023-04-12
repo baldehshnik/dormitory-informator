@@ -1,7 +1,10 @@
 package com.firstapplication.dormapp.ui.fragments
 
+import android.content.ContentResolver
+import android.net.Uri
 import android.view.View
 import android.widget.Toast
+import androidx.annotation.DrawableRes
 import androidx.annotation.IdRes
 import androidx.annotation.StringRes
 import androidx.appcompat.widget.Toolbar
@@ -42,15 +45,24 @@ open class BasicFragment : Fragment() {
     fun switchToolBarVisibility(value: Int) {
         when (value) {
             VISIBLE -> {
-                requireActivity().findViewById<Toolbar>(R.id.toolbar).visibility = View.VISIBLE
+                requireActivity().findViewById<Toolbar>(R.id.toolbar)?.visibility = View.VISIBLE
             }
             INVISIBLE -> {
-                requireActivity().findViewById<Toolbar>(R.id.toolbar).visibility = View.INVISIBLE
+                requireActivity().findViewById<Toolbar>(R.id.toolbar)?.visibility = View.INVISIBLE
             }
             GONE -> {
-                requireActivity().findViewById<Toolbar>(R.id.toolbar).visibility = View.GONE
+                requireActivity().findViewById<Toolbar>(R.id.toolbar)?.visibility = View.GONE
             }
         }
+    }
+
+    fun getUriFromDrawable(@DrawableRes drawableId: Int): Uri {
+        return Uri.parse(
+            ContentResolver.SCHEME_ANDROID_RESOURCE
+                    + "://" + requireContext().resources.getResourcePackageName(drawableId)
+                    + '/' + requireContext().resources.getResourceTypeName(drawableId)
+                    + '/' + requireContext().resources.getResourceEntryName(drawableId)
+        )
     }
 
     companion object {

@@ -7,8 +7,8 @@ import androidx.lifecycle.viewModelScope
 import com.firstapplication.dormapp.data.interfacies.AdminRepository
 import com.firstapplication.dormapp.data.repositories.AdminRepositoryImpl
 import com.firstapplication.dormapp.sealed.*
-import com.firstapplication.dormapp.ui.models.Checker
-import com.firstapplication.dormapp.ui.models.Checker.Companion.STUDENT_CHECK
+import com.firstapplication.dormapp.utils.Checker
+import com.firstapplication.dormapp.utils.Checker.Companion.STUDENT_CHECK
 import com.firstapplication.dormapp.ui.models.StudentModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.transformWhile

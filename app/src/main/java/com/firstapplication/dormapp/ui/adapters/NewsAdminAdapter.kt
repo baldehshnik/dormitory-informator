@@ -13,6 +13,7 @@ import com.firstapplication.dormapp.ui.interfacies.OnAdminNewsItemClickListener
 import com.firstapplication.dormapp.ui.models.NewsModel
 
 class NewsAdminAdapter(
+    private val entities: MutableList<NewsModel>,
     private val listener: OnAdminNewsItemClickListener
 ) : ListAdapter<NewsModel, NewsAdminAdapter.NewsAdminViewHolder>(NewsDiffUtil()) {
 
@@ -31,13 +32,9 @@ class NewsAdminAdapter(
                 .placeholder(R.drawable.ic_baseline_broken_image)
                 .into(binding.imgNewsIcon)
 
-            root.setOnClickListener {
-                listener.onFullItemClick(newsModel)
-            }
-
-            btnEdit.setOnClickListener {
-                listener.onEditClick(newsModel)
-            }
+            root.setOnClickListener { listener.onFullItemClick(newsModel) }
+            root.setOnLongClickListener { listener.onLongClick(adapterPosition) }
+            btnEdit.setOnClickListener { listener.onEditClick(newsModel) }
         }
     }
 
@@ -47,6 +44,17 @@ class NewsAdminAdapter(
     }
 
     override fun onBindViewHolder(holder: NewsAdminViewHolder, position: Int) {
-        holder.bind(getItem(position))
+        holder.bind(entities[position])
+    }
+
+    override fun getItemCount(): Int {
+        return entities.size
+    }
+
+    fun removeSelectedItem(selectedItem: Int) {
+        if (selectedItem >= 0 && selectedItem < entities.size) {
+            entities.removeAt(selectedItem)
+            notifyItemRemoved(selectedItem)
+        }
     }
 }

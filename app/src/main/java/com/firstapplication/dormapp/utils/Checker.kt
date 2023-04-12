@@ -1,4 +1,4 @@
-package com.firstapplication.dormapp.ui.models
+package com.firstapplication.dormapp.utils
 
 import com.firstapplication.dormapp.data.models.NewsEntity
 import com.firstapplication.dormapp.data.models.StudentEntity

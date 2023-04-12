@@ -40,7 +40,9 @@ class NewsInfoFragment : BasicFragment() {
     ): View {
         (activity as MainActivity).activityComponent?.inject(this)
         binding = FragmentNewsInfoBinding.inflate(inflater, container, false)
+
         switchBottomNavViewVisibility(R.id.adminBottomView, GONE)
+        switchBottomNavViewVisibility(R.id.studentBottomView, GONE)
 
         val sharedPreferences = requireActivity().getSharedPreferences(
             LOGIN_USER_PREF,

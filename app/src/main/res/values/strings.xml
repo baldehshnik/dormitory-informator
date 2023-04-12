@@ -10,7 +10,7 @@
     <string name="admin">Admin</string>
     <string name="administrator">Administrator</string>
     <string name="student">Student</string>
-    <string name="bottom_text">Some bottom text</string>
+    <string name="bottom_text">This is a test Application</string>
     <string name="surname">Surname</string>
 
     <string name="admin_dialog_title">Enter key to continue</string>
@@ -94,8 +94,7 @@
         <b>Name:</b> %s;\n
         <b>Patronymic:</b> %s;\n
         <b>Pass number:</b> %s;\n
-        <b>Room:</b> %s;\n
-        <b>Worked hours:</b> %s;\n
+        <b>Room:</b> %s;
     </string>
 
     <string name="invalidate">Invalidate</string>
@@ -103,8 +102,8 @@
     <string name="close">Close</string>
     <string name="student_info">Student information</string>
 
-    <string name="pass_number">Pass number</string>
-    <string name="room_number">Room number</string>
+    <string name="pass_number">Pass</string>
+    <string name="room_number">Room</string>
     <string name="password">Password</string>
     <string name="title">Title</string>
     <string name="hours">Hours</string>
@@ -126,6 +125,8 @@
     <string name="pay">Pay</string>
     <string name="students">Students</string>
     <string name="register_account">Register new account</string>
+
+    <string name="want_remove">Do you really want to remove that item?</string>
 
 
     // Student menu
@@ -164,5 +165,9 @@
     <string name="disabled">Disabled</string>
     <string name="website">Website</string>
     <string name="website_long_v">Website of application</string>
+    <string name="enter_personal_information">Enter personal information:</string>
+    <string name="account_info">Enter information to find out who you are:</string>
+    <string name="forgot_password">Forgot password?</string>
+    <string name="main_hello_question">Who you are?</string>
 
 </resources>

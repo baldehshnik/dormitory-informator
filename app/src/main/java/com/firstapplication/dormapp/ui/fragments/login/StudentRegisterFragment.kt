@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ScrollView
 import androidx.appcompat.app.AlertDialog
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
@@ -37,8 +38,11 @@ class StudentRegisterFragment : BasicFragment() {
         (activity as MainActivity).activityComponent?.inject(this)
         binding = FragmentRegisterStudentBinding.inflate(inflater, container, false)
 
+        val scrollView = ScrollView(requireContext())
+        scrollView.addView(binding.root)
+
         binding.btnRegister.setOnClickListener { onRegisterClick() }
-        binding.btnCancel.setOnClickListener { onCancelClick() }
+        binding.btnBack.setOnClickListener { onCancelClick() }
 
         viewModel.registerResponse.observe(viewLifecycleOwner) { response ->
             when (response) {
@@ -56,7 +60,7 @@ class StudentRegisterFragment : BasicFragment() {
             }
         }
 
-        return binding.root
+        return scrollView
     }
 
     private fun showRegistrationInfoAlertDialog() {

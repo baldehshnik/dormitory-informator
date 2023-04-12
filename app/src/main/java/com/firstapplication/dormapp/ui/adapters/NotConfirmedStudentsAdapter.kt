@@ -11,6 +11,7 @@ import com.firstapplication.dormapp.databinding.NotConfirmedStudentItemBinding
 import com.firstapplication.dormapp.ui.interfacies.OnNotConfirmedStudentItemClickListener
 import com.firstapplication.dormapp.ui.models.StudentModel
 import com.firstapplication.dormapp.ui.models.StudentModel.Companion.NAME_DELIMITER
+import java.util.*
 
 class NotConfirmedStudentsAdapter(
     private val listener: OnNotConfirmedStudentItemClickListener,
@@ -37,14 +38,20 @@ class NotConfirmedStudentsAdapter(
             btnConfirm.setOnClickListener {
                 showDialog(
                     context,
-                    context.resources.getString(R.string.to_confirm_reg_dialog, student.fullName),
+                    context.resources.getString(
+                        R.string.to_confirm_reg_dialog,
+                        student.fullName.split(NAME_DELIMITER).joinToString(" ")
+                    ),
                     model = student
                 )
             }
             btnCancel.setOnClickListener {
                 showDialog(
                     context,
-                    context.resources.getString(R.string.to_cancel_reg_dialog, student.fullName),
+                    context.resources.getString(
+                        R.string.to_cancel_reg_dialog,
+                        student.fullName.split(NAME_DELIMITER).joinToString(" ")
+                    ),
                     pass = pass
                 )
             }

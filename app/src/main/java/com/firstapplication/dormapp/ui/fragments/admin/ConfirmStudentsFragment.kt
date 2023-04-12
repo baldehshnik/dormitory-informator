@@ -42,17 +42,13 @@ class ConfirmStudentsFragment : BasicFragment(), OnNotConfirmedStudentItemClickL
         (activity as MainActivity).activityComponent?.inject(this)
         binding = FragmentConfirmStudentsBinding.inflate(inflater, container, false)
 
+        switchBottomNavViewVisibility(R.id.studentBottomView, INVISIBLE)
         switchBottomNavViewVisibility(R.id.adminBottomView, VISIBLE)
+        switchToolBarVisibility(VISIBLE)
 
         viewModel.readNotConfirmedStudents()
-
-        viewModel.notSavedStudentsResult.observe(viewLifecycleOwner) {
-            handleReadStudentsResult(it)
-        }
-
-        viewModel.confirmResult.observe(viewLifecycleOwner) {
-            handleConfirmResult(it)
-        }
+        viewModel.notSavedStudentsResult.observe(viewLifecycleOwner) { handleReadStudentsResult(it) }
+        viewModel.confirmResult.observe(viewLifecycleOwner) { handleConfirmResult(it) }
 
         return binding.root
     }
@@ -126,7 +122,7 @@ class ConfirmStudentsFragment : BasicFragment(), OnNotConfirmedStudentItemClickL
             .setMessage(
                 resources.getString(
                     R.string.student_info_format, nameParams[0], nameParams[1], nameParams[2],
-                    model.passNumber.toString(), model.roomNumber.toString(), model.hours.toString()
+                    model.passNumber.toString(), model.roomNumber.toString()
                 )
             )
             .create()
