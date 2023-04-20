@@ -2,21 +2,23 @@ package com.firstapplication.dormapp.data.interfacies
 
 import com.firstapplication.dormapp.data.models.NewsEntity
 import com.firstapplication.dormapp.data.models.StudentEntity
+import com.firstapplication.dormapp.sealed.DatabaseResult
+import com.firstapplication.dormapp.sealed.SelectResult
 
-interface AdminRepository {
-    suspend fun readNewsFromDB()
+interface AdminRepository : NewsAbilities {
+    suspend fun readRespondedStudents(newsId: String): SelectResult
+    suspend fun readNotRegisteredStudents(): SelectResult
 
-    suspend fun addNews(news: NewsEntity)
-    suspend fun editNews(news: NewsEntity)
-    suspend fun deleteNews(id: String)
+    suspend fun confirmStudentRegistration(entity: StudentEntity): DatabaseResult
+    suspend fun cancelStudentRegistration(pass: String): DatabaseResult
 
-    suspend fun readRespondedStudents(newsId: String)
+    suspend fun cancelRespondedStudent(newsId: String, pass: String): DatabaseResult
+    suspend fun confirmRespondedStudent(newsId: String, studentEntity: StudentEntity): DatabaseResult
+}
 
-    suspend fun readNotRegisteredStudents()
-
-    suspend fun confirmStudentRegistration(entity: StudentEntity)
-    suspend fun cancelStudentRegistration(pass: String)
-
-    suspend fun cancelRespondedStudent(newsId: String, pass: String)
-    suspend fun confirmRespondedStudent(newsId: String, studentEntity: StudentEntity)
+interface NewsAbilities {
+    suspend fun readNewsFromDB(): SelectResult
+    suspend fun addNews(news: NewsEntity): DatabaseResult
+    suspend fun editNews(news: NewsEntity): DatabaseResult
+    suspend fun deleteNews(id: String): DatabaseResult
 }

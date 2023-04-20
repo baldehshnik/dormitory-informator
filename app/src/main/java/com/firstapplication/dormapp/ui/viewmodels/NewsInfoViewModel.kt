@@ -6,14 +6,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.firstapplication.dormapp.data.interfacies.AdminRepository
 import com.firstapplication.dormapp.data.interfacies.StudentRepository
-import com.firstapplication.dormapp.data.repositories.StudentRepositoryImpl
 import com.firstapplication.dormapp.di.ActivityScope
 import com.firstapplication.dormapp.sealed.ProgressResponse
 import com.firstapplication.dormapp.sealed.ResponseResult
+import com.firstapplication.dormapp.utils.setLiveValueWithMainContext
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.transformWhile
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 @ActivityScope
 class NewsInfoViewModel(
@@ -25,18 +23,8 @@ class NewsInfoViewModel(
     val responseResult: LiveData<ResponseResult> get() = _responseResult
 
     fun addWorker(id: String, userPass: Int) = viewModelScope.launch(Dispatchers.IO) {
-        studentRepository.checkStudentAsWorkerOf(id, userPass)
-        registerResponseListener()
-    }
-
-    private suspend fun registerResponseListener() {
-        (studentRepository as StudentRepositoryImpl).responseResult.transformWhile { value ->
-            emit(value)
-            value == ProgressResponse
-        }.collect { value ->
-            withContext(Dispatchers.Main) {
-                _responseResult.value = value
-            }
-        }
+        setLiveValueWithMainContext(_responseResult, ProgressResponse)
+        val result = studentRepository.checkStudentAsWorkerOf(id, userPass)
+        setLiveValueWithMainContext(_responseResult, result)
     }
 }

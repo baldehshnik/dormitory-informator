@@ -7,7 +7,6 @@ import androidx.lifecycle.viewModelScope
 import com.firstapplication.dormapp.R
 import com.firstapplication.dormapp.data.interfacies.StudentRepository
 import com.firstapplication.dormapp.data.models.StudentEntity
-import com.firstapplication.dormapp.data.repositories.StudentRepositoryImpl
 import com.firstapplication.dormapp.di.ActivityScope
 import com.firstapplication.dormapp.sealed.Correct
 import com.firstapplication.dormapp.sealed.DatabaseResult
@@ -15,10 +14,9 @@ import com.firstapplication.dormapp.sealed.Error
 import com.firstapplication.dormapp.sealed.Progress
 import com.firstapplication.dormapp.ui.models.NewsModel
 import com.firstapplication.dormapp.ui.models.StudentVerifyModel
+import com.firstapplication.dormapp.utils.setLiveValueWithMainContext
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.transformWhile
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 @ActivityScope
 class AccountViewModel(
@@ -33,30 +31,20 @@ class AccountViewModel(
 
     fun getVerifiedUser(studentVerifyModel: StudentVerifyModel) {
         viewModelScope.launch(Dispatchers.IO) {
-            repository.getVerifiedUser(studentVerifyModel.migrateToStudentModel())
-            userDataAccountListener()
+            setLiveValueWithMainContext(_userDataAccount, Progress)
+            val result = repository.getVerifiedUser(studentVerifyModel.migrateToStudentModel())
+            val data = when {
+                result is Error || result == Progress -> result
+                result is Correct<*> && result.value is StudentEntity -> Correct(result.value.migrateToStudentModel())
+                else -> Error(R.string.error)
+            }
+
+            setLiveValueWithMainContext(_userDataAccount, data)
         }
     }
 
     fun addSavedNewsListener() = viewModelScope.launch(Dispatchers.IO) {
         val data = repository.readSavedNewsFromLocalDB().map { it.migrateToNewsModel() }
-        withContext(Dispatchers.Main) {
-            _savedNews.value = data
-        }
-    }
-
-    private suspend fun userDataAccountListener() {
-        (repository as StudentRepositoryImpl).userDataAccount.transformWhile { value ->
-            emit(value)
-            value == Progress
-        }.collect {
-            withContext(Dispatchers.Main) {
-                _userDataAccount.value = when {
-                    it is Error || it == Progress -> it
-                    it is Correct<*> && it.value is StudentEntity -> Correct(it.value.migrateToStudentModel())
-                    else -> Error(R.string.error)
-                }
-            }
-        }
+        setLiveValueWithMainContext(_savedNews, data)
     }
 }

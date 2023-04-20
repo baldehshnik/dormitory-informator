@@ -7,16 +7,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.firstapplication.dormapp.R
 import com.firstapplication.dormapp.data.interfacies.AdminRepository
-import com.firstapplication.dormapp.data.repositories.AdminRepositoryImpl
 import com.firstapplication.dormapp.di.ActivityScope
 import com.firstapplication.dormapp.sealed.DatabaseResult
 import com.firstapplication.dormapp.sealed.Error
 import com.firstapplication.dormapp.sealed.Progress
 import com.firstapplication.dormapp.ui.models.NewsModel
+import com.firstapplication.dormapp.utils.setLiveValueWithMainContext
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.transformWhile
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 @ActivityScope
 class AdminViewModel(
@@ -52,29 +50,33 @@ class AdminViewModel(
         if (edit) editNews(newsModel)
         else insertNews(newsModel)
 
-        changedNewsResultListener()
+//        changedNewsResultListener()
     }
 
     fun deleteNews(id: String) = viewModelScope.launch(Dispatchers.IO) {
-        adminRepository.deleteNews(id)
+        val result = adminRepository.deleteNews(id)
     }
 
     private fun editNews(newsModel: NewsModel) = viewModelScope.launch(Dispatchers.IO) {
-        adminRepository.editNews(newsModel.migrateToNewsEntity())
+        setLiveValueWithMainContext(_changedResult, Progress)
+        val result = adminRepository.editNews(newsModel.migrateToNewsEntity())
+        setLiveValueWithMainContext(_changedResult, result)
     }
 
     private fun insertNews(newsModel: NewsModel) = viewModelScope.launch(Dispatchers.IO) {
-        adminRepository.addNews(newsModel.migrateToNewsEntity())
+        setLiveValueWithMainContext(_changedResult, Progress)
+        val result = adminRepository.addNews(newsModel.migrateToNewsEntity())
+        setLiveValueWithMainContext(_changedResult, result)
     }
 
-    private fun changedNewsResultListener() = viewModelScope.launch(Dispatchers.IO) {
-        (adminRepository as AdminRepositoryImpl).changedNewsResult.transformWhile { value ->
-            emit(value)
-            value == Progress
-        }.collect {
-            withContext(Dispatchers.Main) {
-                _changedResult.value = it
-            }
-        }
-    }
+//    private fun changedNewsResultListener() = viewModelScope.launch(Dispatchers.IO) {
+//        (adminRepository as AdminRepositoryImpl).changedNewsResult.transformWhile { value ->
+//            emit(value)
+//            value == Progress
+//        }.collect {
+//            withContext(Dispatchers.Main) {
+//                _changedResult.value = it
+//            }
+//        }
+//    }
 }

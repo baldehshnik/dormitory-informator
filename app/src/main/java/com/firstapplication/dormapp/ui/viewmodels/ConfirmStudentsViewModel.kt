@@ -1,19 +1,21 @@
 package com.firstapplication.dormapp.ui.viewmodels
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.firstapplication.dormapp.data.interfacies.AdminRepository
-import com.firstapplication.dormapp.data.repositories.AdminRepositoryImpl
-import com.firstapplication.dormapp.sealed.*
-import com.firstapplication.dormapp.ui.models.Checker
-import com.firstapplication.dormapp.ui.models.Checker.Companion.STUDENT_CHECK
+import com.firstapplication.dormapp.sealed.CorrectSelect
+import com.firstapplication.dormapp.sealed.DatabaseResult
+import com.firstapplication.dormapp.sealed.ProgressSelect
+import com.firstapplication.dormapp.sealed.SelectResult
 import com.firstapplication.dormapp.ui.models.StudentModel
+import com.firstapplication.dormapp.utils.Checker
+import com.firstapplication.dormapp.utils.Checker.Companion.STUDENT_CHECK
+import com.firstapplication.dormapp.utils.setLiveValueWithMainContext
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.transformWhile
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class ConfirmStudentsViewModel(
     private val repository: AdminRepository
@@ -26,45 +28,25 @@ class ConfirmStudentsViewModel(
     val confirmResult: LiveData<DatabaseResult> get() = _confirmResult
 
     fun readNotConfirmedStudents() = viewModelScope.launch(Dispatchers.IO) {
-        repository.readNotRegisteredStudents()
-        addNotConfirmedStudentListener()
+        setLiveValueWithMainContext(_notSavedStudentsResult, ProgressSelect)
+        val data = when (val result = repository.readNotRegisteredStudents()) {
+            is CorrectSelect<*> -> Checker(result.value, STUDENT_CHECK).check()
+            else -> result
+        }
+
+        setLiveValueWithMainContext(_notSavedStudentsResult, data)
     }
 
-    fun confirmStudent(model: StudentModel) = viewModelScope.launch(Dispatchers.IO) {
-        repository.confirmStudentRegistration(model.migrateToStudentEntity())
-        setConfirmResultListener()
+    fun confirmStudent(model: StudentModel) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val result = repository.confirmStudentRegistration(model.migrateToStudentEntity())
+            Log.i("ANTHOTER", "result took")
+            setLiveValueWithMainContext(_confirmResult, result)
+        }
     }
 
     fun cancelStudent(pass: String) = viewModelScope.launch(Dispatchers.IO) {
-        repository.cancelStudentRegistration(pass)
-        setConfirmResultListener()
-    }
-
-    private suspend fun addNotConfirmedStudentListener() {
-        (repository as AdminRepositoryImpl).notRegisteredStudentsResult.transformWhile { value ->
-            emit(value)
-            value == ProgressSelect
-        }.collect { result ->
-            withContext(Dispatchers.Main) {
-                val value = if (result is CorrectSelect<*>) {
-                    Checker(result.value, STUDENT_CHECK).check()
-                } else {
-                    result
-                }
-
-                _notSavedStudentsResult.value = value
-            }
-        }
-    }
-
-    private suspend fun setConfirmResultListener() {
-        (repository as AdminRepositoryImpl).confirmResult.transformWhile { value ->
-            emit(value)
-            value == Progress
-        }.collect {
-            withContext(Dispatchers.Main) {
-                _confirmResult.value = it
-            }
-        }
+        val result = repository.cancelStudentRegistration(pass)
+        setLiveValueWithMainContext(_confirmResult, result)
     }
 }

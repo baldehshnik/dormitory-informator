@@ -2,6 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.firstapplication.dormapp">
 
+    <uses-permission android:name="android.permission.INTERNET"/>
+
     <application
         android:name=".DormApp"
         android:allowBackup="true"

@@ -45,7 +45,6 @@ class StudentLoginFragment : BasicFragment() {
                 val roomStr = binding.etRoomNumber.text?.toString() ?: ""
                 val password = binding.etPassword.text?.toString() ?: ""
                 clickConfirm(passStr, roomStr, password)
-                switchEditTexts(false)
             }
             btnCancel.setOnClickListener {
                 parentFragmentManager.popBackStack()
@@ -68,6 +67,7 @@ class StudentLoginFragment : BasicFragment() {
     private fun checkVerifiedUser(result: LoginStudentResult) {
         when (result) {
             ProgressLoginResult -> {
+                switchEditTexts(false)
                 return
             }
             DeletedLoginResult -> {
@@ -128,6 +128,7 @@ class StudentLoginFragment : BasicFragment() {
             viewModel.checkUser(passNumber, roomNumber, Encryptor().encrypt(password) ?: "")
         } catch (e: Exception) {
             toast(getStringFromRes(R.string.date_not_correct))
+            switchEditTexts(true)
         }
     }
 

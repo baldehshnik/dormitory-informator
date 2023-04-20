@@ -5,16 +5,17 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.firstapplication.dormapp.data.interfacies.AdminRepository
-import com.firstapplication.dormapp.data.repositories.AdminRepositoryImpl
 import com.firstapplication.dormapp.di.ActivityScope
-import com.firstapplication.dormapp.sealed.*
-import com.firstapplication.dormapp.ui.models.Checker
-import com.firstapplication.dormapp.ui.models.Checker.Companion.STUDENT_CHECK
+import com.firstapplication.dormapp.sealed.CorrectSelect
+import com.firstapplication.dormapp.sealed.DatabaseResult
+import com.firstapplication.dormapp.sealed.ProgressSelect
+import com.firstapplication.dormapp.sealed.SelectResult
 import com.firstapplication.dormapp.ui.models.StudentModel
+import com.firstapplication.dormapp.utils.Checker
+import com.firstapplication.dormapp.utils.Checker.Companion.STUDENT_CHECK
+import com.firstapplication.dormapp.utils.setLiveValueWithMainContext
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.transformWhile
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 @ActivityScope
 class RespondingStudentListViewModel(
@@ -28,51 +29,29 @@ class RespondingStudentListViewModel(
     private val _confirmStudentResponse = MutableLiveData<DatabaseResult>()
     val confirmStudentResponse: LiveData<DatabaseResult> get() = _confirmStudentResponse
 
+    // need update
     fun confirmStudentResponse(newsId: String, student: StudentModel) {
         viewModelScope.launch(Dispatchers.IO) {
-            repository.confirmRespondedStudent(newsId, student.migrateToStudentEntity())
-            addConfirmStudentResponseListener()
+            val result = repository.confirmRespondedStudent(newsId, student.migrateToStudentEntity())
+            setLiveValueWithMainContext(_confirmStudentResponse, result)
         }
     }
 
     fun cancelStudentResponse(newsId: String, passNumber: Int) {
         viewModelScope.launch(Dispatchers.IO) {
-            repository.cancelRespondedStudent(newsId, passNumber.toString())
-            addConfirmStudentResponseListener()
-        }
-    }
-
-    private fun addConfirmStudentResponseListener() = viewModelScope.launch {
-        (repository as AdminRepositoryImpl).confirmStudentResponse.transformWhile { value ->
-            emit(value)
-            value == Progress
-        }.collect { result ->
-            withContext(Dispatchers.Main) {
-                _confirmStudentResponse.value = result
-            }
+            val result = repository.cancelRespondedStudent(newsId, passNumber.toString())
+            setLiveValueWithMainContext(_confirmStudentResponse, result)
         }
     }
 
     private fun readRespondingStudents() = viewModelScope.launch(Dispatchers.IO) {
-        repository.readRespondedStudents(newsId)
-        addRespondingStudentsListener()
-    }
-
-    private fun addRespondingStudentsListener() = viewModelScope.launch {
-        (repository as AdminRepositoryImpl).respondingStudent.transformWhile { value ->
-            emit(value)
-            value == ProgressSelect
-        }.collect { result ->
-            withContext(Dispatchers.Main) {
-                val value = if (result is CorrectSelect<*>) {
-                    Checker(result.value, STUDENT_CHECK).check()
-                } else {
-                    result
-                }
-
-                _respondingStudentsResult.value = value
-            }
+        setLiveValueWithMainContext(_respondingStudentsResult, ProgressSelect)
+        val data = when(val result = repository.readRespondedStudents(newsId)) {
+            is CorrectSelect<*> -> Checker(result.value, STUDENT_CHECK).check()
+            else -> result
         }
+
+        setLiveValueWithMainContext(_respondingStudentsResult, data)
     }
 
     init {

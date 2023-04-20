@@ -8,15 +8,14 @@ import androidx.lifecycle.viewModelScope
 import com.firstapplication.dormapp.Encryptor
 import com.firstapplication.dormapp.R
 import com.firstapplication.dormapp.data.interfacies.StudentRepository
-import com.firstapplication.dormapp.data.repositories.StudentRepositoryImpl
 import com.firstapplication.dormapp.di.ActivityScope
 import com.firstapplication.dormapp.sealed.DatabaseResult
 import com.firstapplication.dormapp.sealed.Error
 import com.firstapplication.dormapp.sealed.Progress
 import com.firstapplication.dormapp.ui.models.StudentModel
 import com.firstapplication.dormapp.ui.models.StudentModel.Companion.NAME_DELIMITER
+import com.firstapplication.dormapp.utils.setLiveValueWithMainContext
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.transformWhile
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -67,8 +66,9 @@ class StudentRegisterViewModel(
 
     private fun registerStudentInDatabase(studentModel: StudentModel) {
         viewModelScope.launch(Dispatchers.IO) {
-            repository.registerStudent(studentModel.migrateToStudentEntity())
-            setRegisteredStudentResponseListener()
+            setLiveValueWithMainContext(_registerResponse, Progress)
+            val result = repository.registerStudent(studentModel.migrateToStudentEntity())
+            setLiveValueWithMainContext(_registerResponse, result)
         }
     }
 
@@ -78,16 +78,16 @@ class StudentRegisterViewModel(
         }
     }
 
-    private suspend fun setRegisteredStudentResponseListener() {
-        (repository as StudentRepositoryImpl).registerResponse.transformWhile { value ->
-            emit(value)
-            value == Progress
-        }.collect {
-            withContext(Dispatchers.Main) {
-                _registerResponse.value = it
-            }
-        }
-    }
+//    private suspend fun setRegisteredStudentResponseListener() {
+//        (repository as StudentRepositoryImpl).registerResponse.transformWhile { value ->
+//            emit(value)
+//            value == Progress
+//        }.collect {
+//            withContext(Dispatchers.Main) {
+//                _registerResponse.value = it
+//            }
+//        }
+//    }
 
     private suspend fun checkRegistrationData(
         passNumber: String,
