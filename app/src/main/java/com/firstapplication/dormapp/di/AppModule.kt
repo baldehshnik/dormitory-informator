@@ -5,6 +5,7 @@ import androidx.room.Room
 import com.firstapplication.dormapp.data.interfacies.SavedNewsDao
 import com.firstapplication.dormapp.data.local.NewsDatabase
 import com.firstapplication.dormapp.data.local.NewsDatabase.Companion.DATABASE_NAME
+import com.firstapplication.dormapp.data.remote.RealtimeDataSource
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
@@ -34,6 +35,12 @@ object AppModule {
     @Provides
     fun provideSavedNewsDao(newsDatabase: NewsDatabase): SavedNewsDao {
         return newsDatabase.newsDao
+    }
+
+    @Singleton
+    @Provides
+    fun provideRealtimeDataSource(): RealtimeDataSource {
+        return RealtimeDataSource()
     }
 
 }

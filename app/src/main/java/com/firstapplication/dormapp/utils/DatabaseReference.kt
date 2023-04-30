@@ -39,9 +39,9 @@ class SelectBuilder(private val reference: DatabaseReference) {
         reference.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 if (onDataChange != null) {
-                    if (childrenDataChange == true) {
+                    if (childrenDataChange == true && snapshot.exists()) {
                         readChildrenData(snapshot)
-                    } else {
+                    } else if (snapshot.exists()) {
                         onDataChange!!(Snapshot(snapshot))
                     }
                 }

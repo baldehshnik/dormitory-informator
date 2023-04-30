@@ -14,4 +14,8 @@ data class StudentEntity (
     fun migrateToStudentModel(): StudentModel {
         return StudentModel(fullName, imgSrc, passNumber, roomNumber, hours, password)
     }
+
+    fun getStudentVerifyEntity(): StudentVerifyEntity {
+        return StudentVerifyEntity(passNumber, roomNumber, password)
+    }
 }

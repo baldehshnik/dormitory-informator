@@ -7,18 +7,16 @@ import com.firstapplication.dormapp.data.models.*
 import com.firstapplication.dormapp.data.remote.*
 import com.firstapplication.dormapp.enums.ConfirmedRegistration
 import com.firstapplication.dormapp.sealed.*
-import com.firstapplication.dormapp.utils.getOnce
-import com.firstapplication.dormapp.utils.logRealtimeError
-import com.firstapplication.dormapp.utils.set
-import com.google.firebase.database.*
-import com.google.firebase.database.ktx.getValue
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.FirebaseDatabase
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class StudentRepositoryImpl @Inject constructor(
     database: FirebaseDatabase,
-    private val newsDao: SavedNewsDao
+    private val newsDao: SavedNewsDao,
+    private val dataSource: RealtimeDataSource
 ) : StudentRepository {
 
     private val referenceNews = database.reference.child(PACKAGE_NEWS)
@@ -26,87 +24,31 @@ class StudentRepositoryImpl @Inject constructor(
     private val referenceUsers = database.reference.child(PACKAGE_USERS)
 
     override suspend fun checkStudentInDatabase(studentVerifyEntity: StudentVerifyEntity): LoginStudentResult {
-        var result: LoginStudentResult? = null
-        referenceUsers.child(studentVerifyEntity.passNumber.toString())
-            .getOnce()
-            .onDataChange { snapshot ->
-                if (snapshot.dataSnapshot.exists()) {
-                    val user = snapshot.dataSnapshot.getValue<StudentVerifyEntity>()
-                    if (user == studentVerifyEntity) result = CorrectLoginResult
-                }
-            }
-            .onCancelled { error ->
-                logRealtimeError(this, error)
-                result = DbErrorResult
-            }.read()
+        val verifyEntity = dataSource.getObjectFrom<StudentVerifyEntity>(referenceUsers.child(studentVerifyEntity.passNumber.toString()))
+        if (verifyEntity.result == null) return DbErrorResult
+        if (verifyEntity.result == studentVerifyEntity) return CorrectLoginResult
 
-        if (result == DbErrorResult || result == CorrectLoginResult) return result!!
-        result = checkNotRegisteredStudents(studentVerifyEntity)
-
-        return result ?: DbErrorResult
+        return checkNotRegisteredStudents(studentVerifyEntity)
     }
 
     override suspend fun getVerifiedUser(studentVerifyEntity: StudentVerifyEntity): DatabaseResult {
-        var result: DatabaseResult? = null
-        var student: StudentEntity? = null
-        referenceUsers.child(studentVerifyEntity.passNumber.toString())
-            .getOnce()
-            .onDataChange { snapshot ->
-                if (snapshot.dataSnapshot.exists()) {
-                    val user = snapshot.dataSnapshot.getValue<StudentVerifyEntity>()
-                    if (user != studentVerifyEntity) {
-                        result = Error(R.string.user_not_found)
-                    } else {
-                        student = snapshot.dataSnapshot.getValue<StudentEntity>()
-                        if (student == null) result = Error(R.string.user_not_found)
-                    }
-                } else {
-                    result = Error(R.string.user_not_found)
-                }
-            }
-            .onCancelled { error ->
-                logRealtimeError(this, error)
-                result = Error(R.string.error)
-            }.read()
+        val user = dataSource.getObjectFrom<StudentEntity>(referenceUsers.child(studentVerifyEntity.passNumber.toString()))
+        if (user.error != null) return Error(R.string.error)
+        if (user.result == null) return Error(R.string.user_not_found)
 
-        if (result is Error) return result!!
-        else if (student == null) return Error(R.string.error)
+        if (user.result.getStudentVerifyEntity() != studentVerifyEntity) return Error(R.string.error)
 
-        referenceRegistration.child(student!!.passNumber.toString())
-            .getOnce()
-            .onDataChange { snapshot ->
-                result = if (snapshot.dataSnapshot.exists()) {
-                    val value = snapshot.dataSnapshot.getValue<StudentEntity>()
-                    if (value == student) Error(R.string.user_not_found)
-                    else Correct(student)
-                } else {
-                    Correct(student)
-                }
-            }
-            .onCancelled { error ->
-                logRealtimeError(this, error)
-                result = Error(R.string.database_error)
-            }.read()
+        val student = dataSource.getObjectFrom<StudentEntity>(referenceRegistration.child(user.result.passNumber.toString()))
+        if (student.error != null) return Error(R.string.error)
+        if (student.result == null) return Correct(user.result)
 
-        return result ?: Error(R.string.error)
+        return if (student.result == user.result) Error(R.string.user_not_found)
+        else Correct(user.result)
     }
 
     override suspend fun getNews(): SelectResult {
-        var result: SelectResult? = null
-        val news = mutableListOf<NewsEntity>()
-        referenceNews.getOnce()
-            .childrenDataChange(true)
-            .onDataChange { snapshot ->
-                val entity = snapshot.dataSnapshot.getValue<NewsEntity>()
-                if (entity != null) news.add(entity)
-            }
-            .onCancelled { error ->
-                logRealtimeError(this, error)
-                result = ErrorSelect
-            }.read()
-
-        if (result != ErrorSelect) result = CorrectSelect(news)
-        return result ?: ErrorSelect
+        val news = dataSource.readAllFrom<NewsEntity>(referenceNews) ?: return ErrorSelect
+        return CorrectSelect(news)
     }
 
     override suspend fun readSavedNewsFromLocalDB(): List<SavedNewsEntity> {
@@ -121,42 +63,21 @@ class StudentRepositoryImpl @Inject constructor(
         if (result is Error) return result
 
         val registerEntity = StudentRegistrationEntity(studentEntity)
-        referenceRegistration.child(studentEntity.passNumber.toString())
-            .set(registerEntity) { error, _ ->
-                result = if (error != null) {
-                    logRealtimeError(this, error)
-                    Error(R.string.error)
-                } else {
-                    Correct<Any>()
-                }
-            }
-
-        return result
+        val isAdded = dataSource.setObject(referenceRegistration.child(studentEntity.passNumber.toString()), registerEntity)
+        return if (isAdded.error != null) Error(R.string.error)
+        else Correct<Any>()
     }
 
     override suspend fun checkStudentAsWorkerOf(id: String, userPass: Int): ResponseResult {
-        var result: ResponseResult? = null
         val reference = referenceNews.child(id).child(PACKAGE_RESPONSE).child(userPass.toString())
-        reference.getOnce()
-            .onDataChange { snapshot ->
-                if (snapshot.dataSnapshot.exists()) result = AlreadyRegisteredResponse
-            }
-            .onCancelled { error ->
-                logRealtimeError(this, error)
-                result = ErrorResponse
-            }.read()
 
-        if (result == ErrorResponse || result == AlreadyRegisteredResponse) return result!!
-        reference.set(userPass) { error, _ ->
-            result = if (error != null) {
-                logRealtimeError(this, error)
-                ErrorResponse
-            } else {
-                CorrectResponse
-            }
-        }
+        val isRegistered = dataSource.getObjectFrom<Int>(reference)
+        if (isRegistered.error != null) return ErrorResponse
+        if (isRegistered.result != null) return AlreadyRegisteredResponse
 
-        return result ?: ErrorResponse
+        val isAdded = dataSource.setObject(reference, userPass)
+        return if (isAdded.error != null) ErrorResponse
+        else CorrectResponse
     }
 
     private suspend fun doIfNotRegistered(
@@ -164,52 +85,28 @@ class StudentRepositoryImpl @Inject constructor(
         entity: StudentEntity,
         isRegisterReference: Boolean = false
     ): DatabaseResult {
-        var result: DatabaseResult? = null
-        reference.child(entity.passNumber.toString()).getOnce()
-            .onDataChange { snapshot ->
-                val value = snapshot.dataSnapshot.getValue<StudentEntity>()
-                if (value != null && value.passNumber == entity.passNumber) {
-                    result = if (
-                        isRegisterReference && snapshot.dataSnapshot.child(CONFIRM)
-                            .getValue<Int>() == ConfirmedRegistration.NOT_CONFIRMED.value
-                    ) Correct<Any>() else Error(R.string.already_registered)
 
-                    snapshot.cancel = true
-                } else {
-                    result = Correct<Any>()
-                }
-            }
-            .onCancelled { error ->
-                logRealtimeError(this, error)
-                result = Error(R.string.error)
-            }.read()
+        val user = dataSource.getObjectFrom<StudentRegistrationEntity>(reference.child(entity.passNumber.toString()))
+        if (user.error != null) return Error(R.string.error)
 
-        return result ?: Error(R.string.database_error)
+        return if (user.result == null) {
+            Correct<Any>()
+        } else if (isRegisterReference && user.result.confirmed == ConfirmedRegistration.NOT_CONFIRMED.value) {
+            Correct<Any>()
+        } else {
+            Error(R.string.already_registered)
+        }
     }
 
     private suspend fun checkNotRegisteredStudents(entity: StudentVerifyEntity): LoginStudentResult {
-        var result: LoginStudentResult? = null
-        referenceRegistration.child(entity.passNumber.toString())
-            .getOnce()
-            .onDataChange { snapshot ->
-                if (!snapshot.dataSnapshot.exists()) {
-                    result = NotFoundResult
-                    return@onDataChange
-                }
+        val user = dataSource.getObjectFrom<StudentRegistrationEntity>(referenceRegistration.child(entity.passNumber.toString()))
+        if (user.error != null) return DbErrorResult
+        if (user.result == null) return NotFoundResult
 
-                val user = snapshot.dataSnapshot.getValue<StudentVerifyEntity>()
-                result = if (user == entity) {
-                    val confirm = snapshot.dataSnapshot.child(CONFIRM).getValue<Int>()
-                    if (confirm == ConfirmedRegistration.NOT_CONFIRMED.value) DeletedLoginResult else NotVerifiedResult
-                } else {
-                    NotFoundResult
-                }
-            }
-            .onCancelled { error ->
-                logRealtimeError(this, error)
-                result = DbErrorResult
-            }.read()
-
-        return result ?: DbErrorResult
+        return if (user.result.getStudentVerifyEntity() == entity) {
+            if (user.result.confirmed == ConfirmedRegistration.NOT_CONFIRMED.value) DeletedLoginResult else NotVerifiedResult
+        } else {
+            NotFoundResult
+        }
     }
 }
